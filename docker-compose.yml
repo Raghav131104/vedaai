@@ -37,7 +37,7 @@ services:
       - MONGODB_URI=mongodb://mongodb:27017/vedaai
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - ANTHROPIC_API_KEY=ANTHROPIC_API_KEY=sk-ant-real-key
+      - ANTHROPIC_API_KEY=ANTHROPIC_API_KEY=YOUR_API_KEY_HERE
     depends_on:
       mongodb:
         condition: service_healthy

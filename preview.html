@@ -1,948 +1,3202 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>VedaAI — Assessment Creator (v1.1 Preview)</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
-<style>
-/* ── TOKENS ── */
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#e8e8e8;--white:#fff;--side:230px;
-  --text1:#1a1a1a;--text2:#555;--text3:#888;--text4:#bbb;
-  --orange:#e84c1e;--green:#22c55e;--red:#ef4444;
-  --border:#e0e0e0;--border2:#ccc;
-  --sh1:0 1px 3px rgba(0,0,0,.08);--sh2:0 2px 8px rgba(0,0,0,.10);--sh3:0 4px 20px rgba(0,0,0,.14);
-  --r:8px;--r2:12px;--r3:16px;
-  --font:'Inter',-apple-system,sans-serif;
-}
-html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--bg);color:var(--text1);font-size:14px;-webkit-font-smoothing:antialiased}
-::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:#ccc;border-radius:2px}
-input,select,textarea,button{font-family:var(--font)}
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>VedaAI — Assessment Creator</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* ── TOKENS ── */
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      :root {
+        --bg: #e8e8e8;
+        --white: #fff;
+        --side: 230px;
+        --text1: #1a1a1a;
+        --text2: #555;
+        --text3: #888;
+        --text4: #bbb;
+        --orange: #e84c1e;
+        --green: #22c55e;
+        --red: #ef4444;
+        --border: #e0e0e0;
+        --border2: #ccc;
+        --sh1: 0 1px 3px rgba(0, 0, 0, 0.08);
+        --sh2: 0 2px 8px rgba(0, 0, 0, 0.1);
+        --sh3: 0 4px 20px rgba(0, 0, 0, 0.14);
+        --r: 8px;
+        --r2: 12px;
+        --r3: 16px;
+        --font: "Inter", -apple-system, sans-serif;
+      }
+      html,
+      body {
+        height: 100%;
+        overflow: hidden;
+        font-family: var(--font);
+        background: var(--bg);
+        color: var(--text1);
+        font-size: 14px;
+        -webkit-font-smoothing: antialiased;
+      }
+      ::-webkit-scrollbar {
+        width: 4px;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #ccc;
+        border-radius: 2px;
+      }
+      input,
+      select,
+      textarea,
+      button {
+        font-family: var(--font);
+      }
 
-/* ── SHELL ── */
-.app{display:flex;height:100vh;padding:8px;gap:8px}
+      /* ── SHELL ── */
+      .app {
+        display: flex;
+        height: 100vh;
+        padding: 8px;
+        gap: 8px;
+      }
 
-/* ── SIDEBAR ── */
-.sidebar{width:var(--side);min-width:var(--side);background:var(--white);border-radius:var(--r3);display:flex;flex-direction:column;padding:18px 12px;box-shadow:var(--sh1);flex-shrink:0}
-.sb-logo{display:flex;align-items:center;gap:9px;padding:0 6px;margin-bottom:14px}
-.sb-logo-icon{width:32px;height:32px;border-radius:7px;background:linear-gradient(145deg,#ff7040,#e84c1e);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.sb-logo-icon svg{width:18px;height:18px;fill:white}
-.sb-logo-text{font-size:1.08rem;font-weight:700;color:var(--text1)}
-.sb-create{width:100%;border:none;border-radius:22px;padding:9px 14px;margin-bottom:18px;background:linear-gradient(135deg,#2e2e2e,#1a1a1a);color:white;font-size:.8rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;position:relative;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.25);transition:opacity .2s}
-.sb-create:hover{opacity:.88}
-.sb-star{width:16px;height:16px;border-radius:50%;background:linear-gradient(135deg,#ff9a4d,#e84c1e);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.sb-star svg{width:9px;height:9px;fill:white}
-.sb-div{height:1px;background:var(--border);margin:0 2px 10px}
-.sb-nav-item{display:flex;align-items:center;gap:9px;padding:8px 9px;border-radius:7px;cursor:pointer;font-size:.82rem;color:var(--text2);margin-bottom:2px;transition:background .15s}
-.sb-nav-item:hover{background:#f4f4f4}
-.sb-nav-item.active{background:#f0f0f0;color:var(--text1);font-weight:500}
-.sb-nav-item svg{width:15px;height:15px;flex-shrink:0;opacity:.7;stroke:currentColor;fill:none}
-.sb-nav-item.active svg{opacity:1}
-.sb-badge{margin-left:auto;background:var(--orange);color:white;font-size:.58rem;font-weight:700;padding:1px 6px;border-radius:99px;min-width:17px;text-align:center;display:none}
-.sb-spacer{flex:1}
-.sb-bottom{padding:10px 2px 0;border-top:1px solid var(--border)}
-.sb-settings{display:flex;align-items:center;gap:8px;padding:7px 8px;font-size:.8rem;color:var(--text3);cursor:pointer;margin-bottom:8px}
-.sb-settings svg{width:14px;height:14px;flex-shrink:0;stroke:currentColor;fill:none}
-.sb-school{display:flex;align-items:center;gap:9px;background:#f7f7f7;border-radius:10px;padding:9px 10px;cursor:pointer}
-.sb-school-av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#ff9a4d,#e84c1e);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.sb-school-av svg{width:18px;height:18px;fill:white}
-.sb-school-name{font-size:.76rem;font-weight:600;color:var(--text1)}
-.sb-school-city{font-size:.68rem;color:var(--text3)}
+      /* ── SIDEBAR ── */
+      .sidebar {
+        width: var(--side);
+        min-width: var(--side);
+        background: var(--white);
+        border-radius: var(--r3);
+        display: flex;
+        flex-direction: column;
+        padding: 18px 12px;
+        box-shadow: var(--sh1);
+        flex-shrink: 0;
+      }
+      .sb-logo {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        padding: 0 6px;
+        margin-bottom: 14px;
+      }
+      .sb-logo-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 7px;
+        background: linear-gradient(145deg, #ff7040, #e84c1e);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+      .sb-logo-icon svg {
+        width: 18px;
+        height: 18px;
+        fill: white;
+      }
+      .sb-logo-text {
+        font-size: 1.08rem;
+        font-weight: 700;
+        color: var(--text1);
+      }
+      .sb-create {
+        width: 100%;
+        border: none;
+        border-radius: 22px;
+        padding: 9px 14px;
+        margin-bottom: 18px;
+        background: linear-gradient(135deg, #2e2e2e, #1a1a1a);
+        color: white;
+        font-size: 0.8rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+        transition: opacity 0.2s;
+      }
+      .sb-create:hover {
+        opacity: 0.88;
+      }
+      .sb-star {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #ff9a4d, #e84c1e);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+      .sb-star svg {
+        width: 9px;
+        height: 9px;
+        fill: white;
+      }
+      .sb-div {
+        height: 1px;
+        background: var(--border);
+        margin: 0 2px 10px;
+      }
+      .sb-nav-item {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        padding: 8px 9px;
+        border-radius: 7px;
+        cursor: pointer;
+        font-size: 0.82rem;
+        color: var(--text2);
+        margin-bottom: 2px;
+        transition: background 0.15s;
+      }
+      .sb-nav-item:hover {
+        background: #f4f4f4;
+      }
+      .sb-nav-item.active {
+        background: #f0f0f0;
+        color: var(--text1);
+        font-weight: 500;
+      }
+      .sb-nav-item svg {
+        width: 15px;
+        height: 15px;
+        flex-shrink: 0;
+        opacity: 0.7;
+        stroke: currentColor;
+        fill: none;
+      }
+      .sb-nav-item.active svg {
+        opacity: 1;
+      }
+      .sb-badge {
+        margin-left: auto;
+        background: var(--orange);
+        color: white;
+        font-size: 0.58rem;
+        font-weight: 700;
+        padding: 1px 6px;
+        border-radius: 99px;
+        min-width: 17px;
+        text-align: center;
+        display: none;
+      }
+      .sb-spacer {
+        flex: 1;
+      }
+      .sb-bottom {
+        padding: 10px 2px 0;
+        border-top: 1px solid var(--border);
+      }
+      .sb-settings {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 7px 8px;
+        font-size: 0.8rem;
+        color: var(--text3);
+        cursor: pointer;
+        margin-bottom: 8px;
+      }
+      .sb-settings svg {
+        width: 14px;
+        height: 14px;
+        flex-shrink: 0;
+        stroke: currentColor;
+        fill: none;
+      }
+      .sb-school {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        background: #f7f7f7;
+        border-radius: 10px;
+        padding: 9px 10px;
+        cursor: pointer;
+      }
+      .sb-school-av {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #ff9a4d, #e84c1e);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+      .sb-school-av svg {
+        width: 18px;
+        height: 18px;
+        fill: white;
+      }
+      .sb-school-name {
+        font-size: 0.76rem;
+        font-weight: 600;
+        color: var(--text1);
+      }
+      .sb-school-city {
+        font-size: 0.68rem;
+        color: var(--text3);
+      }
 
-/* ── MAIN ── */
-.main{flex:1;display:flex;flex-direction:column;background:var(--white);border-radius:var(--r3);overflow:hidden;box-shadow:var(--sh1)}
+      /* ── MAIN ── */
+      .main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        background: var(--white);
+        border-radius: var(--r3);
+        overflow: hidden;
+        box-shadow: var(--sh1);
+      }
 
-/* ── TOPBAR ── */
-.topbar{height:56px;display:flex;align-items:center;padding:0 18px;border-bottom:1px solid var(--border);gap:8px;flex-shrink:0}
-.tb-back{width:28px;height:28px;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text2);transition:background .15s}
-.tb-back:hover{background:#f0f0f0}
-.tb-back svg{width:15px;height:15px;stroke:currentColor;fill:none}
-.tb-bc{font-size:.8rem;color:var(--text2);display:flex;align-items:center;gap:5px}
-.tb-bc svg{width:13px;height:13px;stroke:currentColor;fill:none;opacity:.6}
-.tb-sp{flex:1}
-.tb-notif{position:relative;width:30px;height:30px;border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer}
-.tb-notif svg{width:17px;height:17px;stroke:var(--text2);fill:none}
-.tb-notif-dot{position:absolute;top:5px;right:6px;width:6px;height:6px;border-radius:50%;background:var(--orange);border:1.5px solid white}
-.tb-user{display:flex;align-items:center;gap:7px;padding:3px 8px 3px 3px;border-radius:8px;cursor:pointer}
-.tb-av{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#ff9a4d,#e84c1e);display:flex;align-items:center;justify-content:center}
-.tb-av svg{width:14px;height:14px;fill:white}
-.tb-uname{font-size:.8rem;font-weight:500}
+      /* ── TOPBAR ── */
+      .topbar {
+        height: 56px;
+        display: flex;
+        align-items: center;
+        padding: 0 18px;
+        border-bottom: 1px solid var(--border);
+        gap: 8px;
+        flex-shrink: 0;
+      }
+      .tb-back {
+        width: 28px;
+        height: 28px;
+        border-radius: 6px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text2);
+        transition: background 0.15s;
+      }
+      .tb-back:hover {
+        background: #f0f0f0;
+      }
+      .tb-back svg {
+        width: 15px;
+        height: 15px;
+        stroke: currentColor;
+        fill: none;
+      }
+      .tb-bc {
+        font-size: 0.8rem;
+        color: var(--text2);
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+      .tb-bc svg {
+        width: 13px;
+        height: 13px;
+        stroke: currentColor;
+        fill: none;
+        opacity: 0.6;
+      }
+      .tb-sp {
+        flex: 1;
+      }
+      .tb-notif {
+        position: relative;
+        width: 30px;
+        height: 30px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+      }
+      .tb-notif svg {
+        width: 17px;
+        height: 17px;
+        stroke: var(--text2);
+        fill: none;
+      }
+      .tb-notif-dot {
+        position: absolute;
+        top: 5px;
+        right: 6px;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--orange);
+        border: 1.5px solid white;
+      }
+      .tb-user {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        padding: 3px 8px 3px 3px;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+      .tb-av {
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #ff9a4d, #e84c1e);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .tb-av svg {
+        width: 14px;
+        height: 14px;
+        fill: white;
+      }
+      .tb-uname {
+        font-size: 0.8rem;
+        font-weight: 500;
+      }
 
-/* ── SCROLL ── */
-.pg-scroll{flex:1;overflow-y:auto;background:#f0f0f0}
+      /* ── SCROLL ── */
+      .pg-scroll {
+        flex: 1;
+        overflow-y: auto;
+        background: #f0f0f0;
+      }
 
-/* ── VIEWS ── */
-.view{display:none;flex-direction:column;height:100%;overflow:hidden}
-.view.active{display:flex}
+      /* ── VIEWS ── */
+      .view {
+        display: none;
+        flex-direction: column;
+        height: 100%;
+        overflow: hidden;
+      }
+      .view.active {
+        display: flex;
+      }
 
-/* ── DASHBOARD ── */
-.pg-hdr{padding:14px 22px 12px;background:white;border-bottom:1px solid var(--border);flex-shrink:0}
-.pg-hdr-row{display:flex;align-items:center;gap:7px;margin-bottom:3px}
-.pg-dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0}
-.pg-title{font-size:.98rem;font-weight:700}
-.pg-sub{font-size:.75rem;color:var(--text3);margin-left:14px}
-.filter-bar{display:flex;align-items:center;gap:10px;padding:10px 22px;background:white;border-bottom:1px solid var(--border);flex-shrink:0}
-.filter-btn{display:flex;align-items:center;gap:5px;padding:5px 11px;border:1px solid var(--border);border-radius:6px;background:white;font-size:.76rem;color:var(--text2);cursor:pointer}
-.filter-btn svg{width:11px;height:11px;stroke:currentColor;fill:none}
-.srch{flex:1;max-width:260px;position:relative}
-.srch input{width:100%;padding:6px 10px 6px 30px;border:1px solid var(--border);border-radius:6px;font-size:.76rem;color:var(--text1);background:white;outline:none}
-.srch input::placeholder{color:var(--text4)}
-.srch-ico{position:absolute;left:8px;top:50%;transform:translateY(-50%);color:var(--text3)}
-.srch-ico svg{width:13px;height:13px;stroke:currentColor;fill:none}
-.assign-scroll{flex:1;overflow-y:auto;padding:14px 22px 80px}
-.assign-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.a-card{background:white;border-radius:var(--r2);padding:14px 14px 12px;border:1px solid var(--border);position:relative;cursor:pointer;transition:box-shadow .2s;display:flex;flex-direction:column;min-height:86px}
-.a-card:hover{box-shadow:var(--sh2);border-color:#c8c8c8}
-.a-card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px}
-.a-title{font-size:.87rem;font-weight:600;flex:1;padding-right:6px}
-.a-menu{width:22px;height:22px;border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text3);flex-shrink:0}
-.a-menu:hover{background:#f0f0f0}
-.a-menu svg{width:13px;height:13px;stroke:currentColor;fill:none}
-.a-foot{display:flex;align-items:center;justify-content:space-between;font-size:.7rem;color:var(--text3);margin-top:auto}
-.a-foot strong{color:var(--text2);font-weight:500}
-.ctx-menu{position:absolute;right:10px;top:34px;background:white;border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--sh3);z-index:200;min-width:136px;display:none;overflow:hidden}
-.ctx-menu.open{display:block}
-.ctx-item{padding:9px 13px;font-size:.8rem;cursor:pointer;color:var(--text1);transition:background .1s}
-.ctx-item:hover{background:#f5f5f5}
-.ctx-item.danger{color:var(--red)}
-.ctx-item.danger:hover{background:#fff5f5}
-.fab-row{position:sticky;bottom:0;display:flex;justify-content:center;padding:10px;background:linear-gradient(to top,#f0f0f0 60%,transparent);pointer-events:none}
-.fab-btn{display:flex;align-items:center;gap:7px;background:#1a1a1a;color:white;padding:9px 20px;border-radius:22px;font-size:.8rem;font-weight:600;border:none;cursor:pointer;box-shadow:var(--sh3);pointer-events:all;transition:background .2s}
-.fab-btn:hover{background:#333}
-.fab-btn svg{width:13px;height:13px;stroke:white;fill:none}
-.empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#f0f0f0;padding:40px 20px;text-align:center}
-.empty-title{font-size:.95rem;font-weight:700;margin-bottom:8px}
-.empty-desc{font-size:.8rem;color:var(--text3);max-width:340px;line-height:1.65;margin-bottom:22px}
-.empty-btn{display:inline-flex;align-items:center;gap:7px;background:#1a1a1a;color:white;padding:10px 20px;border-radius:22px;font-size:.8rem;font-weight:600;border:none;cursor:pointer}
-.empty-btn:hover{background:#333}
-.empty-btn svg{width:13px;height:13px;stroke:white;fill:none}
+      /* ── DASHBOARD ── */
+      .pg-hdr {
+        padding: 14px 22px 12px;
+        background: white;
+        border-bottom: 1px solid var(--border);
+        flex-shrink: 0;
+      }
+      .pg-hdr-row {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        margin-bottom: 3px;
+      }
+      .pg-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--green);
+        flex-shrink: 0;
+      }
+      .pg-title {
+        font-size: 0.98rem;
+        font-weight: 700;
+      }
+      .pg-sub {
+        font-size: 0.75rem;
+        color: var(--text3);
+        margin-left: 14px;
+      }
+      .filter-bar {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 22px;
+        background: white;
+        border-bottom: 1px solid var(--border);
+        flex-shrink: 0;
+      }
+      .filter-btn {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        padding: 5px 11px;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        background: white;
+        font-size: 0.76rem;
+        color: var(--text2);
+        cursor: pointer;
+      }
+      .filter-btn svg {
+        width: 11px;
+        height: 11px;
+        stroke: currentColor;
+        fill: none;
+      }
+      .srch {
+        flex: 1;
+        max-width: 260px;
+        position: relative;
+      }
+      .srch input {
+        width: 100%;
+        padding: 6px 10px 6px 30px;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        font-size: 0.76rem;
+        color: var(--text1);
+        background: white;
+        outline: none;
+      }
+      .srch input::placeholder {
+        color: var(--text4);
+      }
+      .srch-ico {
+        position: absolute;
+        left: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text3);
+      }
+      .srch-ico svg {
+        width: 13px;
+        height: 13px;
+        stroke: currentColor;
+        fill: none;
+      }
+      .assign-scroll {
+        flex: 1;
+        overflow-y: auto;
+        padding: 14px 22px 80px;
+      }
+      .assign-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+      .a-card {
+        background: white;
+        border-radius: var(--r2);
+        padding: 14px 14px 12px;
+        border: 1px solid var(--border);
+        position: relative;
+        cursor: pointer;
+        transition: box-shadow 0.2s;
+        display: flex;
+        flex-direction: column;
+        min-height: 86px;
+      }
+      .a-card:hover {
+        box-shadow: var(--sh2);
+        border-color: #c8c8c8;
+      }
+      .a-card-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        margin-bottom: 18px;
+      }
+      .a-title {
+        font-size: 0.87rem;
+        font-weight: 600;
+        flex: 1;
+        padding-right: 6px;
+      }
+      .a-menu {
+        width: 22px;
+        height: 22px;
+        border-radius: 4px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text3);
+        flex-shrink: 0;
+      }
+      .a-menu:hover {
+        background: #f0f0f0;
+      }
+      .a-menu svg {
+        width: 13px;
+        height: 13px;
+        stroke: currentColor;
+        fill: none;
+      }
+      .a-foot {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 0.7rem;
+        color: var(--text3);
+        margin-top: auto;
+      }
+      .a-foot strong {
+        color: var(--text2);
+        font-weight: 500;
+      }
+      .ctx-menu {
+        position: absolute;
+        right: 10px;
+        top: 34px;
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: var(--r);
+        box-shadow: var(--sh3);
+        z-index: 200;
+        min-width: 136px;
+        display: none;
+        overflow: hidden;
+      }
+      .ctx-menu.open {
+        display: block;
+      }
+      .ctx-item {
+        padding: 9px 13px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        color: var(--text1);
+        transition: background 0.1s;
+      }
+      .ctx-item:hover {
+        background: #f5f5f5;
+      }
+      .ctx-item.danger {
+        color: var(--red);
+      }
+      .ctx-item.danger:hover {
+        background: #fff5f5;
+      }
+      .fab-row {
+        position: sticky;
+        bottom: 0;
+        display: flex;
+        justify-content: center;
+        padding: 10px;
+        background: linear-gradient(to top, #f0f0f0 60%, transparent);
+        pointer-events: none;
+      }
+      .fab-btn {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        background: #1a1a1a;
+        color: white;
+        padding: 9px 20px;
+        border-radius: 22px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        box-shadow: var(--sh3);
+        pointer-events: all;
+        transition: background 0.2s;
+      }
+      .fab-btn:hover {
+        background: #333;
+      }
+      .fab-btn svg {
+        width: 13px;
+        height: 13px;
+        stroke: white;
+        fill: none;
+      }
+      .empty {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: #f0f0f0;
+        padding: 40px 20px;
+        text-align: center;
+      }
+      .empty-title {
+        font-size: 0.95rem;
+        font-weight: 700;
+        margin-bottom: 8px;
+      }
+      .empty-desc {
+        font-size: 0.8rem;
+        color: var(--text3);
+        max-width: 340px;
+        line-height: 1.65;
+        margin-bottom: 22px;
+      }
+      .empty-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        background: #1a1a1a;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 22px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+      }
+      .empty-btn:hover {
+        background: #333;
+      }
+      .empty-btn svg {
+        width: 13px;
+        height: 13px;
+        stroke: white;
+        fill: none;
+      }
 
-/* ── CREATE FORM ── */
-.cr-hdr{padding:14px 22px 12px;background:white;border-bottom:1px solid var(--border);flex-shrink:0}
-.cr-status-row{display:flex;align-items:center;gap:7px;margin-bottom:2px}
-.cr-title{font-size:.96rem;font-weight:700}
-.cr-sub{font-size:.74rem;color:var(--text3)}
-.step-track{height:3px;background:#e8e8e8;margin-top:12px;border-radius:2px;overflow:hidden}
-.step-fill{height:100%;background:#1a1a1a;border-radius:2px;transition:width .4s;width:33%}
-.cr-scroll{flex:1;overflow-y:auto;padding:18px 22px 100px}
-.f-card{background:white;border-radius:var(--r2);padding:22px;margin-bottom:14px;border:1px solid var(--border);box-shadow:var(--sh1)}
-.f-card-title{font-size:.88rem;font-weight:700;margin-bottom:3px}
-.f-card-sub{font-size:.73rem;color:var(--text3);margin-bottom:16px}
-.upload-zone{border:1.5px dashed #ccc;border-radius:var(--r2);padding:28px 18px;text-align:center;cursor:pointer;background:#fafafa;transition:all .2s;margin-bottom:10px}
-.upload-zone:hover,.upload-zone.drag{border-color:#999;background:#f5f5f5}
-.upload-icon{color:#aaa;margin:0 auto 9px;display:flex;justify-content:center}
-.upload-icon svg{width:30px;height:30px;stroke:currentColor;fill:none}
-.upload-text{font-size:.8rem;font-weight:500;color:var(--text2);margin-bottom:4px}
-.upload-hint{font-size:.7rem;color:var(--text3);margin-bottom:11px}
-.browse-btn{display:inline-block;padding:5px 14px;border:1px solid var(--border2);border-radius:6px;font-size:.74rem;font-weight:500;color:var(--text2);background:white;cursor:pointer}
-.upload-caption{font-size:.7rem;color:var(--text3);text-align:center;margin-top:8px}
-.file-display{display:flex;align-items:center;justify-content:center;gap:7px;font-size:.8rem;color:var(--text2)}
-.file-clear{background:none;border:none;cursor:pointer;color:var(--text3);display:flex}
-.file-clear:hover{color:var(--red)}
-.file-clear svg{width:12px;height:12px;stroke:currentColor;fill:none}
-/* FILE CONTENT PREVIEW — shows extracted text */
-.file-preview{background:#f9f9f9;border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;margin-top:8px;font-size:.72rem;color:var(--text2);max-height:80px;overflow-y:auto;line-height:1.5;white-space:pre-wrap}
-.file-preview-label{font-size:.7rem;color:var(--green);font-weight:500;margin-bottom:4px;display:flex;align-items:center;gap:4px}
-.file-preview-label svg{width:11px;height:11px;stroke:currentColor;fill:none}
-.field{margin-bottom:13px}
-.f-label{display:block;font-size:.74rem;font-weight:500;color:var(--text2);margin-bottom:5px}
-.f-input{width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:var(--r);font-size:.82rem;color:var(--text1);background:white;outline:none;transition:border .2s}
-.f-input:focus{border-color:#999}
-.f-input::placeholder{color:#bbb}
-.f-input.err{border-color:var(--red)}
-.f-err{font-size:.7rem;color:var(--red);margin-top:4px;display:none}
-.f-err.show{display:block}
-.f-row{display:grid;grid-template-columns:1fr 1fr;gap:11px}
-.date-wrap{position:relative}
-.date-ico{position:absolute;right:9px;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none}
-.date-ico svg{width:15px;height:15px;stroke:currentColor;fill:none}
-/* Question type rows */
-.qt-header{display:grid;grid-template-columns:1fr 110px 90px;gap:8px;padding:7px 0 5px;border-bottom:1px solid var(--border);margin-bottom:6px}
-.qt-header span{font-size:.7rem;font-weight:600;color:var(--text2)}
-.qt-header span:nth-child(2),.qt-header span:nth-child(3){text-align:center}
-.qt-row{display:grid;grid-template-columns:1fr 110px 90px;gap:8px;align-items:center;margin-bottom:7px}
-.qt-sel-wrap{display:flex;align-items:center;gap:5px}
-.qt-sel{flex:1;padding:7px 26px 7px 9px;border:1px solid var(--border);border-radius:var(--r);font-size:.76rem;color:var(--text1);appearance:none;background:white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 7px center;cursor:pointer;outline:none}
-.qt-x{width:20px;height:20px;border-radius:50%;border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;cursor:pointer;background:white;color:var(--text3);font-size:.85rem;flex-shrink:0}
-.qt-x:hover{background:#fef2f2;color:var(--red);border-color:#fca5a5}
-.num-ctrl{display:flex;align-items:center;border:1px solid var(--border);border-radius:var(--r);overflow:hidden;background:white}
-.num-btn{width:26px;height:30px;border:none;background:white;cursor:pointer;font-size:.85rem;color:var(--text2);flex-shrink:0;transition:background .15s}
-.num-btn:hover{background:#f0f0f0}
-.num-inp{flex:1;width:28px;text-align:center;border:none;border-left:1px solid var(--border);border-right:1px solid var(--border);font-size:.77rem;font-weight:500;color:var(--text1);outline:none;height:30px;background:white;font-family:var(--font)}
-.add-qt{display:flex;align-items:center;gap:7px;background:none;border:none;cursor:pointer;font-size:.78rem;color:var(--text1);font-weight:500;padding:6px 0}
-.add-qt-circle{width:21px;height:21px;border-radius:50%;background:#1a1a1a;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:white;font-size:.95rem;line-height:1}
-.qt-totals{text-align:right;font-size:.76rem;color:var(--text2);border-top:1px solid var(--border);padding-top:6px;margin-top:6px}
-.qt-totals div{margin-bottom:2px}
-.qt-totals strong{color:var(--text1)}
-.f-textarea{width:100%;resize:none;padding:9px 11px;border:1px solid var(--border);border-radius:var(--r);font-size:.82rem;color:var(--text1);outline:none;min-height:76px;background:white;transition:border .2s;font-family:var(--font)}
-.f-textarea:focus{border-color:#999}
-.f-textarea::placeholder{color:#bbb}
-.cr-footer{position:sticky;bottom:0;display:flex;align-items:center;justify-content:space-between;padding:12px 22px;background:white;border-top:1px solid var(--border);flex-shrink:0}
-.btn-prev{display:flex;align-items:center;gap:5px;padding:8px 16px;border:1px solid var(--border);border-radius:22px;background:white;font-size:.8rem;font-weight:500;color:var(--text2);cursor:pointer}
-.btn-next{display:flex;align-items:center;gap:5px;padding:8px 20px;border:none;border-radius:22px;background:#1a1a1a;color:white;font-size:.8rem;font-weight:600;cursor:pointer;transition:background .2s}
-.btn-next:hover{background:#333}
-.btn-next:disabled{background:#bbb;cursor:not-allowed}
-.btn-next svg,.btn-prev svg{width:13px;height:13px;stroke:currentColor;fill:none}
+      /* ── CREATE FORM ── */
+      .cr-hdr {
+        padding: 14px 22px 12px;
+        background: white;
+        border-bottom: 1px solid var(--border);
+        flex-shrink: 0;
+      }
+      .cr-status-row {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        margin-bottom: 2px;
+      }
+      .cr-title {
+        font-size: 0.96rem;
+        font-weight: 700;
+      }
+      .cr-sub {
+        font-size: 0.74rem;
+        color: var(--text3);
+      }
+      .step-track {
+        height: 3px;
+        background: #e8e8e8;
+        margin-top: 12px;
+        border-radius: 2px;
+        overflow: hidden;
+      }
+      .step-fill {
+        height: 100%;
+        background: #1a1a1a;
+        border-radius: 2px;
+        transition: width 0.4s;
+        width: 33%;
+      }
+      .cr-scroll {
+        flex: 1;
+        overflow-y: auto;
+        padding: 18px 22px 100px;
+      }
+      .f-card {
+        background: white;
+        border-radius: var(--r2);
+        padding: 22px;
+        margin-bottom: 14px;
+        border: 1px solid var(--border);
+        box-shadow: var(--sh1);
+      }
+      .f-card-title {
+        font-size: 0.88rem;
+        font-weight: 700;
+        margin-bottom: 3px;
+      }
+      .f-card-sub {
+        font-size: 0.73rem;
+        color: var(--text3);
+        margin-bottom: 16px;
+      }
+      .upload-zone {
+        border: 1.5px dashed #ccc;
+        border-radius: var(--r2);
+        padding: 28px 18px;
+        text-align: center;
+        cursor: pointer;
+        background: #fafafa;
+        transition: all 0.2s;
+        margin-bottom: 10px;
+      }
+      .upload-zone:hover,
+      .upload-zone.drag {
+        border-color: #999;
+        background: #f5f5f5;
+      }
+      .upload-icon {
+        color: #aaa;
+        margin: 0 auto 9px;
+        display: flex;
+        justify-content: center;
+      }
+      .upload-icon svg {
+        width: 30px;
+        height: 30px;
+        stroke: currentColor;
+        fill: none;
+      }
+      .upload-text {
+        font-size: 0.8rem;
+        font-weight: 500;
+        color: var(--text2);
+        margin-bottom: 4px;
+      }
+      .upload-hint {
+        font-size: 0.7rem;
+        color: var(--text3);
+        margin-bottom: 11px;
+      }
+      .browse-btn {
+        display: inline-block;
+        padding: 5px 14px;
+        border: 1px solid var(--border2);
+        border-radius: 6px;
+        font-size: 0.74rem;
+        font-weight: 500;
+        color: var(--text2);
+        background: white;
+        cursor: pointer;
+      }
+      .upload-caption {
+        font-size: 0.7rem;
+        color: var(--text3);
+        text-align: center;
+        margin-top: 8px;
+      }
+      .file-display {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        font-size: 0.8rem;
+        color: var(--text2);
+      }
+      .file-clear {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: var(--text3);
+        display: flex;
+      }
+      .file-clear:hover {
+        color: var(--red);
+      }
+      .file-clear svg {
+        width: 12px;
+        height: 12px;
+        stroke: currentColor;
+        fill: none;
+      }
+      /* FILE CONTENT PREVIEW — shows extracted text */
+      .file-preview {
+        background: #f9f9f9;
+        border: 1px solid var(--border);
+        border-radius: var(--r);
+        padding: 10px 12px;
+        margin-top: 8px;
+        font-size: 0.72rem;
+        color: var(--text2);
+        max-height: 80px;
+        overflow-y: auto;
+        line-height: 1.5;
+        white-space: pre-wrap;
+      }
+      .file-preview-label {
+        font-size: 0.7rem;
+        color: var(--green);
+        font-weight: 500;
+        margin-bottom: 4px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .file-preview-label svg {
+        width: 11px;
+        height: 11px;
+        stroke: currentColor;
+        fill: none;
+      }
+      .field {
+        margin-bottom: 13px;
+      }
+      .f-label {
+        display: block;
+        font-size: 0.74rem;
+        font-weight: 500;
+        color: var(--text2);
+        margin-bottom: 5px;
+      }
+      .f-input {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid var(--border);
+        border-radius: var(--r);
+        font-size: 0.82rem;
+        color: var(--text1);
+        background: white;
+        outline: none;
+        transition: border 0.2s;
+      }
+      .f-input:focus {
+        border-color: #999;
+      }
+      .f-input::placeholder {
+        color: #bbb;
+      }
+      .f-input.err {
+        border-color: var(--red);
+      }
+      .f-err {
+        font-size: 0.7rem;
+        color: var(--red);
+        margin-top: 4px;
+        display: none;
+      }
+      .f-err.show {
+        display: block;
+      }
+      .f-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 11px;
+      }
+      .date-wrap {
+        position: relative;
+      }
+      .date-ico {
+        position: absolute;
+        right: 9px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text3);
+        pointer-events: none;
+      }
+      .date-ico svg {
+        width: 15px;
+        height: 15px;
+        stroke: currentColor;
+        fill: none;
+      }
+      /* Question type rows */
+      .qt-header {
+        display: grid;
+        grid-template-columns: 1fr 110px 90px;
+        gap: 8px;
+        padding: 7px 0 5px;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 6px;
+      }
+      .qt-header span {
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: var(--text2);
+      }
+      .qt-header span:nth-child(2),
+      .qt-header span:nth-child(3) {
+        text-align: center;
+      }
+      .qt-row {
+        display: grid;
+        grid-template-columns: 1fr 110px 90px;
+        gap: 8px;
+        align-items: center;
+        margin-bottom: 7px;
+      }
+      .qt-sel-wrap {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+      .qt-sel {
+        flex: 1;
+        padding: 7px 26px 7px 9px;
+        border: 1px solid var(--border);
+        border-radius: var(--r);
+        font-size: 0.76rem;
+        color: var(--text1);
+        appearance: none;
+        background: white
+          url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")
+          no-repeat right 7px center;
+        cursor: pointer;
+        outline: none;
+      }
+      .qt-x {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        border: 1px solid var(--border2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        background: white;
+        color: var(--text3);
+        font-size: 0.85rem;
+        flex-shrink: 0;
+      }
+      .qt-x:hover {
+        background: #fef2f2;
+        color: var(--red);
+        border-color: #fca5a5;
+      }
+      .num-ctrl {
+        display: flex;
+        align-items: center;
+        border: 1px solid var(--border);
+        border-radius: var(--r);
+        overflow: hidden;
+        background: white;
+      }
+      .num-btn {
+        width: 26px;
+        height: 30px;
+        border: none;
+        background: white;
+        cursor: pointer;
+        font-size: 0.85rem;
+        color: var(--text2);
+        flex-shrink: 0;
+        transition: background 0.15s;
+      }
+      .num-btn:hover {
+        background: #f0f0f0;
+      }
+      .num-inp {
+        flex: 1;
+        width: 28px;
+        text-align: center;
+        border: none;
+        border-left: 1px solid var(--border);
+        border-right: 1px solid var(--border);
+        font-size: 0.77rem;
+        font-weight: 500;
+        color: var(--text1);
+        outline: none;
+        height: 30px;
+        background: white;
+        font-family: var(--font);
+      }
+      .add-qt {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 0.78rem;
+        color: var(--text1);
+        font-weight: 500;
+        padding: 6px 0;
+      }
+      .add-qt-circle {
+        width: 21px;
+        height: 21px;
+        border-radius: 50%;
+        background: #1a1a1a;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        color: white;
+        font-size: 0.95rem;
+        line-height: 1;
+      }
+      .qt-totals {
+        text-align: right;
+        font-size: 0.76rem;
+        color: var(--text2);
+        border-top: 1px solid var(--border);
+        padding-top: 6px;
+        margin-top: 6px;
+      }
+      .qt-totals div {
+        margin-bottom: 2px;
+      }
+      .qt-totals strong {
+        color: var(--text1);
+      }
+      .f-textarea {
+        width: 100%;
+        resize: none;
+        padding: 9px 11px;
+        border: 1px solid var(--border);
+        border-radius: var(--r);
+        font-size: 0.82rem;
+        color: var(--text1);
+        outline: none;
+        min-height: 76px;
+        background: white;
+        transition: border 0.2s;
+        font-family: var(--font);
+      }
+      .f-textarea:focus {
+        border-color: #999;
+      }
+      .f-textarea::placeholder {
+        color: #bbb;
+      }
+      .cr-footer {
+        position: sticky;
+        bottom: 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 22px;
+        background: white;
+        border-top: 1px solid var(--border);
+        flex-shrink: 0;
+      }
+      .btn-prev {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        padding: 8px 16px;
+        border: 1px solid var(--border);
+        border-radius: 22px;
+        background: white;
+        font-size: 0.8rem;
+        font-weight: 500;
+        color: var(--text2);
+        cursor: pointer;
+      }
+      .btn-next {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        padding: 8px 20px;
+        border: none;
+        border-radius: 22px;
+        background: #1a1a1a;
+        color: white;
+        font-size: 0.8rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .btn-next:hover {
+        background: #333;
+      }
+      .btn-next:disabled {
+        background: #bbb;
+        cursor: not-allowed;
+      }
+      .btn-next svg,
+      .btn-prev svg {
+        width: 13px;
+        height: 13px;
+        stroke: currentColor;
+        fill: none;
+      }
 
-/* ── PROCESSING ── */
-.proc-wrap{flex:1;display:flex;align-items:center;justify-content:center;background:#f0f0f0}
-.proc-box{max-width:460px;width:100%;padding:20px;text-align:center}
-.proc-orb{position:relative;width:96px;height:96px;margin:0 auto 22px}
-.proc-r1{position:absolute;inset:0;border-radius:50%;border:2px solid rgba(0,0,0,.06);animation:ping 2s ease infinite}
-.proc-r2{position:absolute;inset:8px;border-radius:50%;border:2px solid rgba(0,0,0,.08);border-top-color:#1a1a1a;animation:spin .85s linear infinite}
-.proc-r3{position:absolute;inset:18px;border-radius:50%;background:#f0f0f0;border:1px solid rgba(0,0,0,.07);display:flex;align-items:center;justify-content:center}
-.proc-r3 svg{width:20px;height:20px;stroke:#333;fill:none}
-.proc-title{font-size:1.1rem;font-weight:700;margin-bottom:7px}
-.proc-msg{font-size:.8rem;color:var(--text3);margin-bottom:22px}
-.proc-prog-meta{display:flex;justify-content:space-between;font-size:.7rem;color:var(--text3);margin-bottom:6px}
-.proc-track{height:4px;background:#e0e0e0;border-radius:99px;overflow:hidden;margin-bottom:22px}
-.proc-fill{height:100%;background:#1a1a1a;border-radius:99px;transition:width .65s cubic-bezier(.4,0,.2,1)}
-.proc-steps{background:white;border-radius:var(--r2);padding:14px;box-shadow:var(--sh1);border:1px solid var(--border)}
-.p-step{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #f2f2f2}
-.p-step:last-child{border-bottom:none}
-.p-step-icon{width:22px;height:22px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;border:1.5px solid;transition:all .4s}
-.p-step-icon.done{background:#f0fdf4;border-color:#86efac}
-.p-step-icon.done svg{width:10px;height:10px;stroke:var(--green);fill:none}
-.p-step-icon.active{background:#f5f5f5;border-color:#aaa;animation:step-pulse 1.5s ease infinite}
-.p-step-icon.active svg{width:10px;height:10px;stroke:#666;fill:none}
-.p-step-icon.idle{background:#fafafa;border-color:#e0e0e0}
-.p-step-icon.idle svg{width:10px;height:10px;stroke:#ccc;fill:none}
-.p-step-text{font-size:.78rem;flex:1;transition:color .4s}
-.p-step-text.done{color:var(--text2)}
-.p-step-text.active{color:var(--text1);font-weight:500}
-.p-step-text.idle{color:#ccc}
-.p-step-chk{width:14px;height:14px;flex-shrink:0;opacity:0;transform:scale(0);transition:all .3s cubic-bezier(.34,1.56,.64,1)}
-.p-step-chk.show{opacity:1;transform:scale(1)}
-.p-step-chk svg{width:14px;height:14px;stroke:var(--green);fill:none}
+      /* ── PROCESSING ── */
+      .proc-wrap {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f0f0f0;
+      }
+      .proc-box {
+        max-width: 460px;
+        width: 100%;
+        padding: 20px;
+        text-align: center;
+      }
+      .proc-orb {
+        position: relative;
+        width: 96px;
+        height: 96px;
+        margin: 0 auto 22px;
+      }
+      .proc-r1 {
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        border: 2px solid rgba(0, 0, 0, 0.06);
+        animation: ping 2s ease infinite;
+      }
+      .proc-r2 {
+        position: absolute;
+        inset: 8px;
+        border-radius: 50%;
+        border: 2px solid rgba(0, 0, 0, 0.08);
+        border-top-color: #1a1a1a;
+        animation: spin 0.85s linear infinite;
+      }
+      .proc-r3 {
+        position: absolute;
+        inset: 18px;
+        border-radius: 50%;
+        background: #f0f0f0;
+        border: 1px solid rgba(0, 0, 0, 0.07);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .proc-r3 svg {
+        width: 20px;
+        height: 20px;
+        stroke: #333;
+        fill: none;
+      }
+      .proc-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-bottom: 7px;
+      }
+      .proc-msg {
+        font-size: 0.8rem;
+        color: var(--text3);
+        margin-bottom: 22px;
+      }
+      .proc-prog-meta {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.7rem;
+        color: var(--text3);
+        margin-bottom: 6px;
+      }
+      .proc-track {
+        height: 4px;
+        background: #e0e0e0;
+        border-radius: 99px;
+        overflow: hidden;
+        margin-bottom: 22px;
+      }
+      .proc-fill {
+        height: 100%;
+        background: #1a1a1a;
+        border-radius: 99px;
+        transition: width 0.65s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .proc-steps {
+        background: white;
+        border-radius: var(--r2);
+        padding: 14px;
+        box-shadow: var(--sh1);
+        border: 1px solid var(--border);
+      }
+      .p-step {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 7px 0;
+        border-bottom: 1px solid #f2f2f2;
+      }
+      .p-step:last-child {
+        border-bottom: none;
+      }
+      .p-step-icon {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1.5px solid;
+        transition: all 0.4s;
+      }
+      .p-step-icon.done {
+        background: #f0fdf4;
+        border-color: #86efac;
+      }
+      .p-step-icon.done svg {
+        width: 10px;
+        height: 10px;
+        stroke: var(--green);
+        fill: none;
+      }
+      .p-step-icon.active {
+        background: #f5f5f5;
+        border-color: #aaa;
+        animation: step-pulse 1.5s ease infinite;
+      }
+      .p-step-icon.active svg {
+        width: 10px;
+        height: 10px;
+        stroke: #666;
+        fill: none;
+      }
+      .p-step-icon.idle {
+        background: #fafafa;
+        border-color: #e0e0e0;
+      }
+      .p-step-icon.idle svg {
+        width: 10px;
+        height: 10px;
+        stroke: #ccc;
+        fill: none;
+      }
+      .p-step-text {
+        font-size: 0.78rem;
+        flex: 1;
+        transition: color 0.4s;
+      }
+      .p-step-text.done {
+        color: var(--text2);
+      }
+      .p-step-text.active {
+        color: var(--text1);
+        font-weight: 500;
+      }
+      .p-step-text.idle {
+        color: #ccc;
+      }
+      .p-step-chk {
+        width: 14px;
+        height: 14px;
+        flex-shrink: 0;
+        opacity: 0;
+        transform: scale(0);
+        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+      .p-step-chk.show {
+        opacity: 1;
+        transform: scale(1);
+      }
+      .p-step-chk svg {
+        width: 14px;
+        height: 14px;
+        stroke: var(--green);
+        fill: none;
+      }
 
-/* ── OUTPUT ── */
-.out-ai-bar{padding:12px 20px;background:#2c2c2c;flex-shrink:0}
-.out-ai-text{font-size:.84rem;color:rgba(255,255,255,.88);line-height:1.55;margin-bottom:9px}
-.dl-btn{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:6px;font-size:.74rem;font-weight:500;color:white;cursor:pointer;transition:background .2s}
-.dl-btn:hover{background:rgba(255,255,255,.18)}
-.dl-btn svg{width:13px;height:13px;stroke:white;fill:none}
-.out-paper-wrap{flex:1;overflow-y:auto;background:#f0f0f0}
-.out-paper{background:white;max-width:700px;margin:18px auto;border-radius:var(--r2);padding:38px 46px;box-shadow:var(--sh2);border:1px solid var(--border)}
-.paper-school{font-size:1.05rem;font-weight:700;text-align:center;color:#111;margin-bottom:2px}
-.paper-subj{font-size:.88rem;font-weight:600;text-align:center;color:#333;margin-bottom:2px}
-.paper-cls{font-size:.85rem;text-align:center;color:#555;margin-bottom:14px}
-.paper-hr{border:none;border-top:1px solid #ddd;margin:10px 0}
-.paper-meta{display:flex;justify-content:space-between;font-size:.76rem;color:#444;padding:6px 0}
-.paper-instr{font-size:.76rem;color:#444;margin:8px 0;font-style:italic}
-.paper-student{margin:10px 0 16px}
-.paper-student-row{display:flex;align-items:center;gap:6px;font-size:.78rem;color:#333;margin-bottom:5px}
-.paper-line{flex:1;border-bottom:1px solid #aaa;min-width:100px;height:14px}
-.sec-title{font-size:.88rem;font-weight:700;text-align:center;color:#111;margin:16px 0 8px}
-.sec-type{font-size:.8rem;font-weight:700;color:#111;margin-bottom:2px}
-.sec-instr{font-size:.75rem;color:#555;font-style:italic;margin-bottom:10px}
-.q-item{font-size:.79rem;color:#222;line-height:1.7;margin-bottom:6px;display:flex;gap:5px}
-.q-num{flex-shrink:0}
-.diff-tag{display:inline-block;font-size:.65rem;font-weight:600;padding:1px 6px;border-radius:4px;margin-right:4px;vertical-align:middle}
-.diff-easy{background:#dcfce7;color:#166534}
-.diff-medium{background:#fef3c7;color:#92400e}
-.diff-hard{background:#fee2e2;color:#991b1b}
-.paper-end{font-size:.78rem;font-weight:700;color:#111;margin-top:14px}
+      /* ── OUTPUT ── */
+      .out-ai-bar {
+        padding: 12px 20px;
+        background: #2c2c2c;
+        flex-shrink: 0;
+      }
+      .out-ai-text {
+        font-size: 0.84rem;
+        color: rgba(255, 255, 255, 0.88);
+        line-height: 1.55;
+        margin-bottom: 9px;
+      }
+      .dl-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 14px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 6px;
+        font-size: 0.74rem;
+        font-weight: 500;
+        color: white;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .dl-btn:hover {
+        background: rgba(255, 255, 255, 0.18);
+      }
+      .dl-btn svg {
+        width: 13px;
+        height: 13px;
+        stroke: white;
+        fill: none;
+      }
+      .out-paper-wrap {
+        flex: 1;
+        overflow-y: auto;
+        background: #f0f0f0;
+      }
+      .out-paper {
+        background: white;
+        max-width: 700px;
+        margin: 18px auto;
+        border-radius: var(--r2);
+        padding: 38px 46px;
+        box-shadow: var(--sh2);
+        border: 1px solid var(--border);
+      }
+      .paper-school {
+        font-size: 1.05rem;
+        font-weight: 700;
+        text-align: center;
+        color: #111;
+        margin-bottom: 2px;
+      }
+      .paper-subj {
+        font-size: 0.88rem;
+        font-weight: 600;
+        text-align: center;
+        color: #333;
+        margin-bottom: 2px;
+      }
+      .paper-cls {
+        font-size: 0.85rem;
+        text-align: center;
+        color: #555;
+        margin-bottom: 14px;
+      }
+      .paper-hr {
+        border: none;
+        border-top: 1px solid #ddd;
+        margin: 10px 0;
+      }
+      .paper-meta {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.76rem;
+        color: #444;
+        padding: 6px 0;
+      }
+      .paper-instr {
+        font-size: 0.76rem;
+        color: #444;
+        margin: 8px 0;
+        font-style: italic;
+      }
+      .paper-student {
+        margin: 10px 0 16px;
+      }
+      .paper-student-row {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.78rem;
+        color: #333;
+        margin-bottom: 5px;
+      }
+      .paper-line {
+        flex: 1;
+        border-bottom: 1px solid #aaa;
+        min-width: 100px;
+        height: 14px;
+      }
+      .sec-title {
+        font-size: 0.88rem;
+        font-weight: 700;
+        text-align: center;
+        color: #111;
+        margin: 16px 0 8px;
+      }
+      .sec-type {
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: #111;
+        margin-bottom: 2px;
+      }
+      .sec-instr {
+        font-size: 0.75rem;
+        color: #555;
+        font-style: italic;
+        margin-bottom: 10px;
+      }
+      .q-item {
+        font-size: 0.79rem;
+        color: #222;
+        line-height: 1.7;
+        margin-bottom: 6px;
+        display: flex;
+        gap: 5px;
+      }
+      .q-num {
+        flex-shrink: 0;
+      }
+      .diff-tag {
+        display: inline-block;
+        font-size: 0.65rem;
+        font-weight: 600;
+        padding: 1px 6px;
+        border-radius: 4px;
+        margin-right: 4px;
+        vertical-align: middle;
+      }
+      .diff-easy {
+        background: #dcfce7;
+        color: #166534;
+      }
+      .diff-medium {
+        background: #fef3c7;
+        color: #92400e;
+      }
+      .diff-hard {
+        background: #fee2e2;
+        color: #991b1b;
+      }
+      .paper-end {
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: #111;
+        margin-top: 14px;
+      }
 
-/* ── SETTINGS ── */
-.settings-wrap{flex:1;overflow-y:auto;background:#f0f0f0;padding:20px 22px 80px}
-.settings-card{background:white;border-radius:var(--r2);padding:22px;border:1px solid var(--border);box-shadow:var(--sh1);max-width:600px}
-.settings-title{font-size:.88rem;font-weight:700;margin-bottom:4px}
-.settings-sub{font-size:.73rem;color:var(--text3);margin-bottom:20px}
-.preview-box{border:1px solid var(--border);border-radius:var(--r);padding:14px;background:#f9f9f9;margin-top:6px;text-align:center}
-.preview-label{font-size:.68rem;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
-.preview-school{font-size:.92rem;font-weight:700;color:#111}
-.preview-meta{font-size:.72rem;color:#555;margin-top:3px}
-.save-btn{width:100%;padding:10px;background:#1a1a1a;color:white;border:none;border-radius:22px;font-size:.82rem;font-weight:600;cursor:pointer;margin-top:16px;transition:background .2s;display:flex;align-items:center;justify-content:center;gap:7px}
-.save-btn:hover{background:#333}
-.save-btn svg{width:14px;height:14px;stroke:white;fill:none}
+      /* ── SETTINGS ── */
+      .settings-wrap {
+        flex: 1;
+        overflow-y: auto;
+        background: #f0f0f0;
+        padding: 20px 22px 80px;
+      }
+      .settings-card {
+        background: white;
+        border-radius: var(--r2);
+        padding: 22px;
+        border: 1px solid var(--border);
+        box-shadow: var(--sh1);
+        max-width: 600px;
+      }
+      .settings-title {
+        font-size: 0.88rem;
+        font-weight: 700;
+        margin-bottom: 4px;
+      }
+      .settings-sub {
+        font-size: 0.73rem;
+        color: var(--text3);
+        margin-bottom: 20px;
+      }
+      .preview-box {
+        border: 1px solid var(--border);
+        border-radius: var(--r);
+        padding: 14px;
+        background: #f9f9f9;
+        margin-top: 6px;
+        text-align: center;
+      }
+      .preview-label {
+        font-size: 0.68rem;
+        color: var(--text3);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 8px;
+      }
+      .preview-school {
+        font-size: 0.92rem;
+        font-weight: 700;
+        color: #111;
+      }
+      .preview-meta {
+        font-size: 0.72rem;
+        color: #555;
+        margin-top: 3px;
+      }
+      .save-btn {
+        width: 100%;
+        padding: 10px;
+        background: #1a1a1a;
+        color: white;
+        border: none;
+        border-radius: 22px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 16px;
+        transition: background 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+      }
+      .save-btn:hover {
+        background: #333;
+      }
+      .save-btn svg {
+        width: 14px;
+        height: 14px;
+        stroke: white;
+        fill: none;
+      }
 
-/* ── TOAST ── */
-.toast-wrap{position:fixed;top:18px;right:18px;z-index:9999;display:flex;flex-direction:column;gap:7px}
-.toast{background:white;border:1px solid var(--border);border-radius:var(--r);padding:10px 14px;font-size:.78rem;min-width:195px;display:flex;align-items:center;gap:7px;box-shadow:var(--sh3);animation:toast-in .25s ease}
-.toast-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
-.toast.success .toast-dot{background:var(--green)}
-.toast.error .toast-dot{background:var(--red)}
-.toast.info .toast-dot{background:#3b82f6}
+      /* ── TOAST ── */
+      .toast-wrap {
+        position: fixed;
+        top: 18px;
+        right: 18px;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+      }
+      .toast {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: var(--r);
+        padding: 10px 14px;
+        font-size: 0.78rem;
+        min-width: 195px;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        box-shadow: var(--sh3);
+        animation: toast-in 0.25s ease;
+      }
+      .toast-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      .toast.success .toast-dot {
+        background: var(--green);
+      }
+      .toast.error .toast-dot {
+        background: var(--red);
+      }
+      .toast.info .toast-dot {
+        background: #3b82f6;
+      }
 
-/* ── MOBILE ── */
-@media(max-width:768px){
-  .app{padding:0;gap:0;flex-direction:column;background:white}
-  .sidebar{display:none}
-  .main{border-radius:0;box-shadow:none}
-  .topbar{display:none}
-  .m-topbar{display:flex!important;align-items:center;height:50px;padding:0 14px;border-bottom:1px solid var(--border);background:white;flex-shrink:0;gap:9px}
-  .m-logo{display:flex;align-items:center;gap:7px}
-  .m-logo-icon{width:27px;height:27px;border-radius:7px;background:linear-gradient(145deg,#ff7040,#e84c1e);display:flex;align-items:center;justify-content:center}
-  .m-logo-icon svg{width:15px;height:15px;fill:white}
-  .m-logo-text{font-size:.95rem;font-weight:700}
-  .m-sp{flex:1}
-  .m-bot-nav{display:flex!important;background:#1c1c1c;height:58px;flex-shrink:0}
-  .m-nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;font-size:.58rem;color:rgba(255,255,255,.4);font-weight:500}
-  .m-nav-item.active{color:white}
-  .m-nav-item svg{width:17px;height:17px;stroke:currentColor;fill:none}
-  .m-nav-fab{flex:1;display:flex;align-items:center;justify-content:center}
-  .m-fab-btn{width:42px;height:42px;border-radius:50%;background:var(--orange);display:flex;align-items:center;justify-content:center;border:none;cursor:pointer;margin-bottom:6px}
-  .m-fab-btn svg{width:20px;height:20px;stroke:white;fill:none}
-  .assign-grid{grid-template-columns:1fr}
-  .assign-scroll{padding:10px 14px 70px}
-  .filter-bar{display:none}
-  .pg-hdr{display:none}
-  .fab-row{display:none}
-  .cr-scroll{padding:14px 14px 90px}
-  .f-card{padding:16px}
-  .qt-header{grid-template-columns:1fr 95px 80px}
-  .qt-row{grid-template-columns:1fr 95px 80px}
-  .out-paper{margin:10px;padding:20px 16px}
-  .paper-meta{flex-direction:column;gap:3px}
-  .settings-wrap{padding:14px 14px 80px}
-  .settings-card{max-width:none}
-}
-@media(min-width:769px){.m-topbar,.m-bot-nav{display:none!important}}
+      /* ── MOBILE ── */
+      @media (max-width: 768px) {
+        .app {
+          padding: 0;
+          gap: 0;
+          flex-direction: column;
+          background: white;
+        }
+        .sidebar {
+          display: none;
+        }
+        .main {
+          border-radius: 0;
+          box-shadow: none;
+        }
+        .topbar {
+          display: none;
+        }
+        .m-topbar {
+          display: flex !important;
+          align-items: center;
+          height: 50px;
+          padding: 0 14px;
+          border-bottom: 1px solid var(--border);
+          background: white;
+          flex-shrink: 0;
+          gap: 9px;
+        }
+        .m-logo {
+          display: flex;
+          align-items: center;
+          gap: 7px;
+        }
+        .m-logo-icon {
+          width: 27px;
+          height: 27px;
+          border-radius: 7px;
+          background: linear-gradient(145deg, #ff7040, #e84c1e);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .m-logo-icon svg {
+          width: 15px;
+          height: 15px;
+          fill: white;
+        }
+        .m-logo-text {
+          font-size: 0.95rem;
+          font-weight: 700;
+        }
+        .m-sp {
+          flex: 1;
+        }
+        .m-bot-nav {
+          display: flex !important;
+          background: #1c1c1c;
+          height: 58px;
+          flex-shrink: 0;
+        }
+        .m-nav-item {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 3px;
+          cursor: pointer;
+          font-size: 0.58rem;
+          color: rgba(255, 255, 255, 0.4);
+          font-weight: 500;
+        }
+        .m-nav-item.active {
+          color: white;
+        }
+        .m-nav-item svg {
+          width: 17px;
+          height: 17px;
+          stroke: currentColor;
+          fill: none;
+        }
+        .m-nav-fab {
+          flex: 1;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .m-fab-btn {
+          width: 42px;
+          height: 42px;
+          border-radius: 50%;
+          background: var(--orange);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border: none;
+          cursor: pointer;
+          margin-bottom: 6px;
+        }
+        .m-fab-btn svg {
+          width: 20px;
+          height: 20px;
+          stroke: white;
+          fill: none;
+        }
+        .assign-grid {
+          grid-template-columns: 1fr;
+        }
+        .assign-scroll {
+          padding: 10px 14px 70px;
+        }
+        .filter-bar {
+          display: none;
+        }
+        .pg-hdr {
+          display: none;
+        }
+        .fab-row {
+          display: none;
+        }
+        .cr-scroll {
+          padding: 14px 14px 90px;
+        }
+        .f-card {
+          padding: 16px;
+        }
+        .qt-header {
+          grid-template-columns: 1fr 95px 80px;
+        }
+        .qt-row {
+          grid-template-columns: 1fr 95px 80px;
+        }
+        .out-paper {
+          margin: 10px;
+          padding: 20px 16px;
+        }
+        .paper-meta {
+          flex-direction: column;
+          gap: 3px;
+        }
+        .settings-wrap {
+          padding: 14px 14px 80px;
+        }
+        .settings-card {
+          max-width: none;
+        }
+      }
+      @media (min-width: 769px) {
+        .m-topbar,
+        .m-bot-nav {
+          display: none !important;
+        }
+      }
 
-/* ── ANIMATIONS ── */
-@keyframes spin{to{transform:rotate(360deg)}}
-@keyframes ping{0%{transform:scale(1);opacity:.6}80%,100%{transform:scale(1.7);opacity:0}}
-@keyframes step-pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,0,0,.08)}50%{box-shadow:0 0 0 4px rgba(0,0,0,.03)}}
-@keyframes toast-in{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:translateX(0)}}
-@keyframes fade-up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-.fade-up{animation:fade-up .28s ease forwards}
+      /* ── ANIMATIONS ── */
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      @keyframes ping {
+        0% {
+          transform: scale(1);
+          opacity: 0.6;
+        }
+        80%,
+        100% {
+          transform: scale(1.7);
+          opacity: 0;
+        }
+      }
+      @keyframes step-pulse {
+        0%,
+        100% {
+          box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.08);
+        }
+        50% {
+          box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.03);
+        }
+      }
+      @keyframes toast-in {
+        from {
+          opacity: 0;
+          transform: translateX(12px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+      @keyframes fade-up {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .fade-up {
+        animation: fade-up 0.28s ease forwards;
+      }
 
-/* ── FIX BADGES ── */
-.fix-badge{display:inline-flex;align-items:center;gap:4px;font-size:.65rem;padding:2px 7px;border-radius:4px;font-weight:600;vertical-align:middle;margin-left:6px}
-.fix-new{background:#dcfce7;color:#166534}
-.fix-fixed{background:#fef3c7;color:#92400e}
-</style>
-</head>
-<body>
-<div class="toast-wrap" id="toastWrap"></div>
+      /* ── FIX BADGES ── */
+      .fix-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 0.65rem;
+        padding: 2px 7px;
+        border-radius: 4px;
+        font-weight: 600;
+        vertical-align: middle;
+        margin-left: 6px;
+      }
+      .fix-new {
+        background: #dcfce7;
+        color: #166534;
+      }
+      .fix-fixed {
+        background: #fef3c7;
+        color: #92400e;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="toast-wrap" id="toastWrap"></div>
 
-<div class="app" id="app">
-
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <div class="sb-logo">
-      <div class="sb-logo-icon"><svg viewBox="0 0 24 24"><path d="M4 20L12 4L20 20" stroke="white" stroke-width="2.5" stroke-linecap="round" fill="none"/><path d="M7 14H17" stroke="white" stroke-width="2" stroke-linecap="round" fill="none"/></svg></div>
-      <span class="sb-logo-text">VedaAI</span>
-    </div>
-    <button class="sb-create" onclick="goCreate()">
-      <span class="sb-star"><svg viewBox="0 0 24 24" fill="white"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
-      Create Assignment
-    </button>
-    <div class="sb-div"></div>
-    <nav>
-      <div class="sb-nav-item" onclick="setNav(this)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Home</div>
-      <div class="sb-nav-item" onclick="setNav(this)"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>My Groups</div>
-      <div class="sb-nav-item active" id="navAssign" onclick="setNav(this);showDash()"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Assignments<span class="sb-badge" id="sbBadge">0</span></div>
-      <div class="sb-nav-item" onclick="setNav(this);showSettings()"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>Settings<span class="fix-badge fix-new">new</span></div>
-    </nav>
-    <div class="sb-spacer"></div>
-    <div class="sb-bottom">
-      <div class="sb-settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v2m0 18v2"/></svg>Settings</div>
-      <div class="sb-school" onclick="showSettings()">
-        <div class="sb-school-av"><svg viewBox="0 0 36 36"><path d="M18 10l-8 5v2l8 5 8-5v-2l-8-5z" fill="white"/><path d="M10 17v5c0 2.5 3.6 4.5 8 4.5s8-2 8-4.5v-5" fill="white" opacity=".6"/></svg></div>
-        <div><div class="sb-school-name" id="sbSchoolName">Delhi Public School</div><div class="sb-school-city" id="sbSchoolCity">Bokaro Steel City</div></div>
-      </div>
-    </div>
-  </aside>
-
-  <!-- MAIN -->
-  <div class="main">
-
-    <!-- Mobile topbar -->
-    <div class="m-topbar" style="display:none">
-      <div class="m-logo"><div class="m-logo-icon"><svg viewBox="0 0 24 24"><path d="M4 20L12 4L20 20" stroke="white" stroke-width="2.5" stroke-linecap="round" fill="none"/><path d="M7 14H17" stroke="white" stroke-width="2" stroke-linecap="round" fill="none"/></svg></div><span class="m-logo-text">VedaAI</span></div>
-      <div class="m-sp"></div>
-      <div style="position:relative;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><div style="position:absolute;top:4px;right:5px;width:7px;height:7px;border-radius:50%;background:var(--orange);border:1.5px solid white"></div></div>
-      <div style="width:27px;height:27px;border-radius:50%;background:linear-gradient(135deg,#ff9a4d,#e84c1e);display:flex;align-items:center;justify-content:center"><svg width="14" height="14" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
-    </div>
-
-    <!-- DASHBOARD VIEW -->
-    <div class="view active" id="dashView">
-      <div class="topbar">
-        <div class="tb-back"><svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg></div>
-        <div class="tb-bc"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>Assignment</span></div>
-        <div class="tb-sp"></div>
-        <div class="tb-notif"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><div class="tb-notif-dot"></div></div>
-        <div class="tb-user"><div class="tb-av"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><span class="tb-uname">John Doe</span></div>
-      </div>
-      <div id="dashContent" style="display:flex;flex-direction:column;flex:1;overflow:hidden"></div>
-      <div class="m-bot-nav" style="display:none">
-        <div class="m-nav-item active" onclick="mNav('home',this)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Home</div>
-        <div class="m-nav-item" onclick="mNav('assign',this)"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Assignments</div>
-        <div class="m-nav-fab"><button class="m-fab-btn" onclick="goCreate()"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button></div>
-        <div class="m-nav-item" onclick="mNav('lib',this)"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Library</div>
-        <div class="m-nav-item" onclick="mNav('settings',this);showSettings()"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v2m0 18v2"/></svg>Settings</div>
-      </div>
-    </div>
-
-    <!-- CREATE VIEW -->
-    <div class="view" id="createView">
-      <div class="topbar">
-        <div class="tb-back" onclick="showDash()"><svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg></div>
-        <div class="tb-bc"><span>Assignment</span></div>
-        <div class="tb-sp"></div>
-        <div class="tb-notif"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><div class="tb-notif-dot"></div></div>
-        <div class="tb-user"><div class="tb-av"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><span class="tb-uname">John Doe</span></div>
-      </div>
-      <div style="display:none" class="m-topbar" id="mCreateBar">
-        <div style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer" onclick="showDash()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg></div>
-        <span style="font-size:.88rem;font-weight:600">Create Assignment</span>
-        <div class="m-sp"></div>
-      </div>
-      <div class="cr-hdr">
-        <div class="cr-status-row"><div class="pg-dot"></div><span class="cr-title">Create Assignment</span><span class="fix-badge fix-fixed">AI fix ✓</span></div>
-        <div class="cr-sub">Set up a new assignment — upload a file and AI will base questions on it</div>
-        <div class="step-track"><div class="step-fill"></div></div>
-      </div>
-      <div class="cr-scroll pg-scroll">
-        <div class="f-card">
-          <div class="f-card-title">Assignment Details</div>
-          <div class="f-card-sub">Basic information about your assignment</div>
-          <!-- Upload -->
-          <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="handleDrop(event)">
-            <div id="uploadDisplay">
-              <div class="upload-icon"><svg viewBox="0 0 24 24"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg></div>
-              <div class="upload-text">Choose a file or drag & drop</div>
-              <div class="upload-hint">PDF, TXT — AI will generate questions FROM this content</div>
-              <span class="browse-btn">Browse Files</span>
+    <div class="app" id="app">
+      <!-- SIDEBAR -->
+      <aside class="sidebar">
+        <div class="sb-logo">
+          <div class="sb-logo-icon">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M4 20L12 4L20 20"
+                stroke="white"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                fill="none"
+              />
+              <path
+                d="M7 14H17"
+                stroke="white"
+                stroke-width="2"
+                stroke-linecap="round"
+                fill="none"
+              />
+            </svg>
+          </div>
+          <span class="sb-logo-text">VedaAI</span>
+        </div>
+        <button class="sb-create" onclick="goCreate()">
+          <span class="sb-star"
+            ><svg viewBox="0 0 24 24" fill="white">
+              <polygon
+                points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+              /></svg
+          ></span>
+          Create Assignment
+        </button>
+        <div class="sb-div"></div>
+        <nav>
+          <div class="sb-nav-item" onclick="setNav(this)">
+            <svg viewBox="0 0 24 24">
+              <rect x="3" y="3" width="7" height="7" rx="1" />
+              <rect x="14" y="3" width="7" height="7" rx="1" />
+              <rect x="3" y="14" width="7" height="7" rx="1" />
+              <rect x="14" y="14" width="7" height="7" rx="1" /></svg
+            >Home
+          </div>
+          <div class="sb-nav-item" onclick="setNav(this)">
+            <svg viewBox="0 0 24 24">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg
+            >My Groups
+          </div>
+          <div
+            class="sb-nav-item active"
+            id="navAssign"
+            onclick="
+              setNav(this);
+              showDash();
+            "
+          >
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+              />
+              <polyline points="14 2 14 8 20 8" />
+              <line x1="16" y1="13" x2="8" y2="13" />
+              <line x1="16" y1="17" x2="8" y2="17" /></svg
+            >Assignments<span class="sb-badge" id="sbBadge">0</span>
+          </div>
+          <div
+            class="sb-nav-item"
+            onclick="
+              setNav(this);
+              showSettings();
+            "
+          >
+            <svg viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="3" />
+              <path
+                d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"
+              /></svg
+            >Settings<span class="fix-badge fix-new">new</span>
+          </div>
+        </nav>
+        <div class="sb-spacer"></div>
+        <div class="sb-bottom">
+          <div class="sb-settings">
+            <svg viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="3" />
+              <path d="M12 1v2m0 18v2" /></svg
+            >Settings
+          </div>
+          <div class="sb-school" onclick="showSettings()">
+            <div class="sb-school-av">
+              <svg viewBox="0 0 36 36">
+                <path d="M18 10l-8 5v2l8 5 8-5v-2l-8-5z" fill="white" />
+                <path
+                  d="M10 17v5c0 2.5 3.6 4.5 8 4.5s8-2 8-4.5v-5"
+                  fill="white"
+                  opacity=".6"
+                />
+              </svg>
+            </div>
+            <div>
+              <div class="sb-school-name" id="sbSchoolName">
+                Delhi Public School
+              </div>
+              <div class="sb-school-city" id="sbSchoolCity">
+                Bokaro Steel City
+              </div>
             </div>
           </div>
-          <div class="upload-caption">AI will read this file and base ALL questions on its content</div>
-          <div id="filePreviewWrap" style="display:none">
-            <div class="file-preview-label"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>File content extracted — AI will use this</div>
-            <div class="file-preview" id="filePreviewText"></div>
-          </div>
-          <input type="file" id="fileInput" accept=".pdf,.txt,.png,.jpg,.jpeg" style="display:none" onchange="handleFileSelect(event)"/>
+        </div>
+      </aside>
 
-          <div class="field" style="margin-top:14px">
-            <label class="f-label">Due Date</label>
-            <div class="date-wrap">
-              <input type="date" class="f-input" id="fDue"/>
-              <div class="date-ico"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+      <!-- MAIN -->
+      <div class="main">
+        <!-- Mobile topbar -->
+        <div class="m-topbar" style="display: none">
+          <div class="m-logo">
+            <div class="m-logo-icon">
+              <svg viewBox="0 0 24 24">
+                <path
+                  d="M4 20L12 4L20 20"
+                  stroke="white"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  fill="none"
+                />
+                <path
+                  d="M7 14H17"
+                  stroke="white"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  fill="none"
+                />
+              </svg>
             </div>
-            <div class="f-err" id="errDue">Due date must be in the future</div>
+            <span class="m-logo-text">VedaAI</span>
           </div>
-          <div class="field">
-            <label class="f-label">Assignment Title</label>
-            <input type="text" class="f-input" id="fTitle" placeholder="e.g. Quiz on Electricity"/>
-            <div class="f-err" id="errTitle">Title is required</div>
+          <div class="m-sp"></div>
+          <div
+            style="
+              position: relative;
+              width: 30px;
+              height: 30px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              cursor: pointer;
+            "
+          >
+            <svg
+              width="19"
+              height="19"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#555"
+              stroke-width="2"
+            >
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+              <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+            </svg>
+            <div
+              style="
+                position: absolute;
+                top: 4px;
+                right: 5px;
+                width: 7px;
+                height: 7px;
+                border-radius: 50%;
+                background: var(--orange);
+                border: 1.5px solid white;
+              "
+            ></div>
           </div>
-          <div class="f-row">
-            <div class="field">
-              <label class="f-label">Subject</label>
-              <input type="text" class="f-input" id="fSubject" placeholder="e.g. Science"/>
-              <div class="f-err" id="errSubject">Required</div>
+          <div
+            style="
+              width: 27px;
+              height: 27px;
+              border-radius: 50%;
+              background: linear-gradient(135deg, #ff9a4d, #e84c1e);
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            "
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+          </div>
+        </div>
+
+        <!-- DASHBOARD VIEW -->
+        <div class="view active" id="dashView">
+          <div class="topbar">
+            <div class="tb-back">
+              <svg viewBox="0 0 24 24">
+                <line x1="19" y1="12" x2="5" y2="12" />
+                <polyline points="12 19 5 12 12 5" />
+              </svg>
             </div>
-            <div class="field">
-              <label class="f-label">Grade / Class</label>
-              <input type="text" class="f-input" id="fGrade" placeholder="e.g. Grade 8"/>
-              <div class="f-err" id="errGrade">Required</div>
+            <div class="tb-bc">
+              <svg viewBox="0 0 24 24">
+                <rect x="3" y="3" width="7" height="7" rx="1" />
+                <rect x="14" y="3" width="7" height="7" rx="1" />
+                <rect x="3" y="14" width="7" height="7" rx="1" />
+                <rect x="14" y="14" width="7" height="7" rx="1" /></svg
+              ><span>Assignment</span>
+            </div>
+            <div class="tb-sp"></div>
+            <div class="tb-notif">
+              <svg viewBox="0 0 24 24">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+              </svg>
+              <div class="tb-notif-dot"></div>
+            </div>
+            <div class="tb-user">
+              <div class="tb-av">
+                <svg viewBox="0 0 24 24">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+              </div>
+              <span class="tb-uname">John Doe</span>
             </div>
           </div>
-          <!-- Question types -->
-          <div style="margin-top:6px">
-            <div class="qt-header">
-              <span>Question Type</span><span style="text-align:center">No. of Questions</span><span style="text-align:center">Marks</span>
+          <div
+            id="dashContent"
+            style="
+              display: flex;
+              flex-direction: column;
+              flex: 1;
+              overflow: hidden;
+            "
+          ></div>
+          <div class="m-bot-nav" style="display: none">
+            <div class="m-nav-item active" onclick="mNav('home', this)">
+              <svg viewBox="0 0 24 24">
+                <rect x="3" y="3" width="7" height="7" rx="1" />
+                <rect x="14" y="3" width="7" height="7" rx="1" />
+                <rect x="3" y="14" width="7" height="7" rx="1" />
+                <rect x="14" y="14" width="7" height="7" rx="1" /></svg
+              >Home
             </div>
-            <div id="qtRows"></div>
-            <button class="add-qt" onclick="addQT()"><span class="add-qt-circle">+</span>Add Question Type</button>
-            <div class="qt-totals"><div>Total Questions : <strong id="totQ">0</strong></div><div>Total Marks : <strong id="totM">0</strong></div></div>
+            <div class="m-nav-item" onclick="mNav('assign', this)">
+              <svg viewBox="0 0 24 24">
+                <path
+                  d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                />
+                <polyline points="14 2 14 8 20 8" /></svg
+              >Assignments
+            </div>
+            <div class="m-nav-fab">
+              <button class="m-fab-btn" onclick="goCreate()">
+                <svg viewBox="0 0 24 24">
+                  <line x1="12" y1="5" x2="12" y2="19" />
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+              </button>
+            </div>
+            <div class="m-nav-item" onclick="mNav('lib', this)">
+              <svg viewBox="0 0 24 24">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                <path
+                  d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"
+                /></svg
+              >Library
+            </div>
+            <div
+              class="m-nav-item"
+              onclick="
+                mNav('settings', this);
+                showSettings();
+              "
+            >
+              <svg viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="3" />
+                <path d="M12 1v2m0 18v2" /></svg
+              >Settings
+            </div>
           </div>
-          <!-- Additional info -->
-          <div class="field" style="margin-top:14px">
-            <label class="f-label">Additional Instructions</label>
-            <textarea class="f-textarea" id="fInfo" placeholder="e.g. Focus on chapters 3–5, include application-based questions..."></textarea>
+        </div>
+
+        <!-- CREATE VIEW -->
+        <div class="view" id="createView">
+          <div class="topbar">
+            <div class="tb-back" onclick="showDash()">
+              <svg viewBox="0 0 24 24">
+                <line x1="19" y1="12" x2="5" y2="12" />
+                <polyline points="12 19 5 12 12 5" />
+              </svg>
+            </div>
+            <div class="tb-bc"><span>Assignment</span></div>
+            <div class="tb-sp"></div>
+            <div class="tb-notif">
+              <svg viewBox="0 0 24 24">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+              </svg>
+              <div class="tb-notif-dot"></div>
+            </div>
+            <div class="tb-user">
+              <div class="tb-av">
+                <svg viewBox="0 0 24 24">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+              </div>
+              <span class="tb-uname">John Doe</span>
+            </div>
+          </div>
+          <div style="display: none" class="m-topbar" id="mCreateBar">
+            <div
+              style="
+                width: 28px;
+                height: 28px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+              "
+              onclick="showDash()"
+            >
+              <svg
+                width="15"
+                height="15"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#555"
+                stroke-width="2"
+              >
+                <line x1="19" y1="12" x2="5" y2="12" />
+                <polyline points="12 19 5 12 12 5" />
+              </svg>
+            </div>
+            <span style="font-size: 0.88rem; font-weight: 600"
+              >Create Assignment</span
+            >
+            <div class="m-sp"></div>
+          </div>
+          <div class="cr-hdr">
+            <div class="cr-status-row">
+              <div class="pg-dot"></div>
+              <span class="cr-title">Create Assignment</span
+              ><span class="fix-badge fix-fixed">AI</span>
+            </div>
+            <div class="cr-sub">
+              Set up a new assignment — upload a file and AI will base questions
+              on it
+            </div>
+            <div class="step-track"><div class="step-fill"></div></div>
+          </div>
+          <div class="cr-scroll pg-scroll">
+            <div class="f-card">
+              <div class="f-card-title">Assignment Details</div>
+              <div class="f-card-sub">
+                Basic information about your assignment
+              </div>
+              <!-- Upload -->
+              <div
+                class="upload-zone"
+                id="uploadZone"
+                onclick="document.getElementById('fileInput').click()"
+                ondragover="
+                  event.preventDefault();
+                  this.classList.add('drag');
+                "
+                ondragleave="this.classList.remove('drag')"
+                ondrop="handleDrop(event)"
+              >
+                <div id="uploadDisplay">
+                  <div class="upload-icon">
+                    <svg viewBox="0 0 24 24">
+                      <polyline points="16 16 12 12 8 16" />
+                      <line x1="12" y1="12" x2="12" y2="21" />
+                      <path
+                        d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"
+                      />
+                    </svg>
+                  </div>
+                  <div class="upload-text">Choose a file or drag & drop</div>
+                  <div class="upload-hint">
+                    PDF, TXT — AI will generate questions FROM this content
+                  </div>
+                  <span class="browse-btn">Browse Files</span>
+                </div>
+              </div>
+              <div class="upload-caption">
+                AI will read this file and base ALL questions on its content
+              </div>
+              <div id="filePreviewWrap" style="display: none">
+                <div class="file-preview-label">
+                  <svg viewBox="0 0 24 24">
+                    <polyline points="20 6 9 17 4 12" /></svg
+                  >File content extracted — AI will use this
+                </div>
+                <div class="file-preview" id="filePreviewText"></div>
+              </div>
+              <input
+                type="file"
+                id="fileInput"
+                accept=".pdf,.txt,.png,.jpg,.jpeg"
+                style="display: none"
+                onchange="handleFileSelect(event)"
+              />
+
+              <div class="field" style="margin-top: 14px">
+                <label class="f-label">Due Date</label>
+                <div class="date-wrap">
+                  <input type="date" class="f-input" id="fDue" />
+                  <div class="date-ico">
+                    <svg viewBox="0 0 24 24">
+                      <rect x="3" y="4" width="18" height="18" rx="2" />
+                      <line x1="16" y1="2" x2="16" y2="6" />
+                      <line x1="8" y1="2" x2="8" y2="6" />
+                      <line x1="3" y1="10" x2="21" y2="10" />
+                    </svg>
+                  </div>
+                </div>
+                <div class="f-err" id="errDue">
+                  Due date must be in the future
+                </div>
+              </div>
+              <div class="field">
+                <label class="f-label">Assignment Title</label>
+                <input
+                  type="text"
+                  class="f-input"
+                  id="fTitle"
+                  placeholder="e.g. Quiz on Electricity"
+                />
+                <div class="f-err" id="errTitle">Title is required</div>
+              </div>
+              <div class="f-row">
+                <div class="field">
+                  <label class="f-label">Subject</label>
+                  <input
+                    type="text"
+                    class="f-input"
+                    id="fSubject"
+                    placeholder="e.g. Science"
+                  />
+                  <div class="f-err" id="errSubject">Required</div>
+                </div>
+                <div class="field">
+                  <label class="f-label">Grade / Class</label>
+                  <input
+                    type="text"
+                    class="f-input"
+                    id="fGrade"
+                    placeholder="e.g. Grade 8"
+                  />
+                  <div class="f-err" id="errGrade">Required</div>
+                </div>
+              </div>
+              <!-- Question types -->
+              <div style="margin-top: 6px">
+                <div class="qt-header">
+                  <span>Question Type</span
+                  ><span style="text-align: center">No. of Questions</span
+                  ><span style="text-align: center">Marks</span>
+                </div>
+                <div id="qtRows"></div>
+                <button class="add-qt" onclick="addQT()">
+                  <span class="add-qt-circle">+</span>Add Question Type
+                </button>
+                <div class="qt-totals">
+                  <div>Total Questions : <strong id="totQ">0</strong></div>
+                  <div>Total Marks : <strong id="totM">0</strong></div>
+                </div>
+              </div>
+              <!-- Additional info -->
+              <div class="field" style="margin-top: 14px">
+                <label class="f-label">Additional Instructions</label>
+                <textarea
+                  class="f-textarea"
+                  id="fInfo"
+                  placeholder="e.g. Focus on chapters 3–5, include application-based questions..."
+                ></textarea>
+              </div>
+            </div>
+          </div>
+          <div class="cr-footer">
+            <button class="btn-prev" onclick="showDash()">
+              <svg viewBox="0 0 24 24">
+                <line x1="19" y1="12" x2="5" y2="12" />
+                <polyline points="12 19 5 12 12 5" /></svg
+              >Previous
+            </button>
+            <button class="btn-next" id="nextBtn" onclick="handleGenerate()">
+              Generate Paper<svg viewBox="0 0 24 24">
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- PROCESSING VIEW -->
+        <div class="view" id="procView">
+          <div class="topbar">
+            <div class="tb-back" onclick="showDash()">
+              <svg viewBox="0 0 24 24">
+                <line x1="19" y1="12" x2="5" y2="12" />
+                <polyline points="12 19 5 12 12 5" />
+              </svg>
+            </div>
+            <div class="tb-sp"></div>
+            <div class="tb-user">
+              <div class="tb-av">
+                <svg viewBox="0 0 24 24">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+              </div>
+              <span class="tb-uname">John Doe</span>
+            </div>
+          </div>
+          <div class="proc-wrap">
+            <div class="proc-box">
+              <div class="proc-orb">
+                <div class="proc-r1"></div>
+                <div class="proc-r2" id="procRing"></div>
+                <div class="proc-r3">
+                  <svg id="procIcon" viewBox="0 0 24 24">
+                    <path
+                      d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <div class="proc-title" id="procTitle">Generating Paper</div>
+              <div class="proc-msg" id="procMsg">Connecting...</div>
+              <div class="proc-prog-meta">
+                <span>Progress</span><span id="procPct">0%</span>
+              </div>
+              <div class="proc-track">
+                <div class="proc-fill" id="procBar" style="width: 0%"></div>
+              </div>
+              <div class="proc-steps" id="procSteps"></div>
+              <div
+                style="
+                  text-align: center;
+                  font-size: 0.62rem;
+                  color: #ccc;
+                  margin-top: 14px;
+                "
+                id="procId"
+              ></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- OUTPUT VIEW -->
+        <div class="view" id="outputView">
+          <div class="topbar">
+            <div class="tb-back" onclick="showDash()">
+              <svg viewBox="0 0 24 24">
+                <line x1="19" y1="12" x2="5" y2="12" />
+                <polyline points="12 19 5 12 12 5" />
+              </svg>
+            </div>
+            <div class="tb-bc">
+              <span style="cursor: pointer" onclick="showDash()"
+                >← Create New</span
+              >
+            </div>
+            <div class="tb-sp"></div>
+            <div class="tb-user">
+              <div class="tb-av">
+                <svg viewBox="0 0 24 24">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+              </div>
+              <span class="tb-uname">John Doe</span>
+            </div>
+          </div>
+          <div style="display: none" class="m-topbar">
+            <div style="cursor: pointer" onclick="showDash()">
+              <svg
+                width="15"
+                height="15"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#555"
+                stroke-width="2"
+              >
+                <line x1="19" y1="12" x2="5" y2="12" />
+                <polyline points="12 19 5 12 12 5" />
+              </svg>
+            </div>
+            <span style="font-size: 0.88rem; font-weight: 600; margin-left: 8px"
+              >Assignment Output</span
+            >
+            <div class="m-sp"></div>
+          </div>
+          <div class="out-ai-bar">
+            <div class="out-ai-text" id="outAiText">
+              Certainly! Here is your customized question paper:
+            </div>
+            <button class="dl-btn" onclick="window.print()">
+              <svg viewBox="0 0 24 24">
+                <polyline points="8 17 12 21 16 17" />
+                <line x1="12" y1="12" x2="12" y2="21" />
+                <path
+                  d="M20.88 18.09A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.29"
+                /></svg
+              >Download as PDF
+            </button>
+          </div>
+          <div class="out-paper-wrap">
+            <div class="out-paper" id="outPaper"></div>
+          </div>
+        </div>
+
+        <!-- SETTINGS VIEW -->
+        <div class="view" id="settingsView">
+          <div class="topbar">
+            <div class="tb-back" onclick="showDash()">
+              <svg viewBox="0 0 24 24">
+                <line x1="19" y1="12" x2="5" y2="12" />
+                <polyline points="12 19 5 12 12 5" />
+              </svg>
+            </div>
+            <div class="tb-bc">
+              <span>School Settings</span
+              ><span class="fix-badge fix-new">new</span>
+            </div>
+            <div class="tb-sp"></div>
+            <div class="tb-user">
+              <div class="tb-av">
+                <svg viewBox="0 0 24 24">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+              </div>
+              <span class="tb-uname">John Doe</span>
+            </div>
+          </div>
+          <div class="settings-wrap">
+            <div class="settings-card">
+              <div class="settings-title">School Settings</div>
+              <div class="settings-sub">
+                These details appear on every generated question paper header
+              </div>
+              <div class="field">
+                <label class="f-label">School Name *</label
+                ><input
+                  type="text"
+                  class="f-input"
+                  id="sName"
+                  placeholder="e.g. Delhi Public School"
+                />
+              </div>
+              <div class="field">
+                <label class="f-label">Location / City *</label
+                ><input
+                  type="text"
+                  class="f-input"
+                  id="sLocation"
+                  placeholder="e.g. Sector-4, Bokaro Steel City"
+                />
+              </div>
+              <div class="f-row">
+                <div class="field">
+                  <label class="f-label">Board Affiliation</label>
+                  <select
+                    class="f-input"
+                    id="sBoard"
+                    style="appearance: none; cursor: pointer"
+                  >
+                    <option>CBSE</option>
+                    <option>ICSE</option>
+                    <option>State Board</option>
+                    <option>IB</option>
+                    <option>IGCSE</option>
+                    <option>Other</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label class="f-label">Principal Name</label
+                  ><input
+                    type="text"
+                    class="f-input"
+                    id="sPrincipal"
+                    placeholder="Dr. A.K. Sharma"
+                  />
+                </div>
+              </div>
+              <div class="field">
+                <label class="f-label">Full Address</label
+                ><input
+                  type="text"
+                  class="f-input"
+                  id="sAddress"
+                  placeholder="Sector-4, Bokaro Steel City, Jharkhand – 827004"
+                />
+              </div>
+              <div class="f-row">
+                <div class="field">
+                  <label class="f-label">Email</label
+                  ><input
+                    type="email"
+                    class="f-input"
+                    id="sEmail"
+                    placeholder="office@school.edu.in"
+                  />
+                </div>
+                <div class="field">
+                  <label class="f-label">Phone</label
+                  ><input
+                    type="text"
+                    class="f-input"
+                    id="sPhone"
+                    placeholder="+91 12345 67890"
+                  />
+                </div>
+              </div>
+              <!-- Live preview -->
+              <div style="margin-top: 6px">
+                <div class="preview-box">
+                  <div class="preview-label">Paper Header Preview</div>
+                  <div class="preview-school" id="previewSchool">
+                    Delhi Public School, Bokaro Steel City
+                  </div>
+                  <div class="preview-meta" id="previewMeta">
+                    Subject: [Subject] &nbsp;|&nbsp; Class: [Grade]
+                  </div>
+                </div>
+              </div>
+              <button class="save-btn" onclick="saveSettings()">
+                <svg viewBox="0 0 24 24">
+                  <path
+                    d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"
+                  />
+                  <polyline points="17 21 17 13 7 13 7 21" />
+                  <polyline points="7 3 7 8 15 8" /></svg
+                >Save Settings
+              </button>
+            </div>
           </div>
         </div>
       </div>
-      <div class="cr-footer">
-        <button class="btn-prev" onclick="showDash()"><svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>Previous</button>
-        <button class="btn-next" id="nextBtn" onclick="handleGenerate()">Generate Paper<svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
-      </div>
+      <!-- /main -->
     </div>
 
-    <!-- PROCESSING VIEW -->
-    <div class="view" id="procView">
-      <div class="topbar">
-        <div class="tb-back" onclick="showDash()"><svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg></div>
-        <div class="tb-sp"></div>
-        <div class="tb-user"><div class="tb-av"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><span class="tb-uname">John Doe</span></div>
-      </div>
-      <div class="proc-wrap">
-        <div class="proc-box">
-          <div class="proc-orb">
-            <div class="proc-r1"></div>
-            <div class="proc-r2" id="procRing"></div>
-            <div class="proc-r3"><svg id="procIcon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
-          </div>
-          <div class="proc-title" id="procTitle">Generating Paper</div>
-          <div class="proc-msg" id="procMsg">Connecting...</div>
-          <div class="proc-prog-meta"><span>Progress</span><span id="procPct">0%</span></div>
-          <div class="proc-track"><div class="proc-fill" id="procBar" style="width:0%"></div></div>
-          <div class="proc-steps" id="procSteps"></div>
-          <div style="text-align:center;font-size:.62rem;color:#ccc;margin-top:14px" id="procId"></div>
-        </div>
-      </div>
-    </div>
+    <script>
+      /* ═══════════════ STATE ═══════════════ */
+      const TYPES = [
+        "Multiple Choice Questions",
+        "Short Questions",
+        "Long Answer Questions",
+        "Diagram/Graph-Based Questions",
+        "Numerical Problems",
+        "True/False",
+      ];
+      const SL = ["A", "B", "C", "D", "E", "F"];
+      const INSTR = {
+        "Multiple Choice Questions":
+          "Attempt all. Each question carries marks as indicated.",
+        "Short Questions":
+          "Attempt all. Each answer should not exceed 3–4 lines.",
+        "Long Answer Questions":
+          "Attempt any three. Support with suitable examples.",
+        "Diagram/Graph-Based Questions": "Draw neat and labelled diagrams.",
+        "Numerical Problems": "Show all working steps clearly.",
+        "True/False": "State whether True or False.",
+      };
+      let qTypes = [
+        { t: "Multiple Choice Questions", n: 4, m: 1 },
+        { t: "Short Questions", n: 3, m: 2 },
+        { t: "Diagram/Graph-Based Questions", n: 5, m: 5 },
+        { t: "Numerical Problems", n: 5, m: 5 },
+      ];
+      let uploadedFile = null,
+        fileTextContent = "";
+      let assignments = [],
+        currentAssessment = null,
+        openCtx = null;
+      let schoolSettings = {
+        name: "Delhi Public School",
+        location: "Bokaro Steel City",
+        board: "CBSE",
+        principal: "",
+        address: "",
+        email: "",
+        phone: "",
+      };
 
-    <!-- OUTPUT VIEW -->
-    <div class="view" id="outputView">
-      <div class="topbar">
-        <div class="tb-back" onclick="showDash()"><svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg></div>
-        <div class="tb-bc"><span style="cursor:pointer" onclick="showDash()">← Create New</span></div>
-        <div class="tb-sp"></div>
-        <div class="tb-user"><div class="tb-av"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><span class="tb-uname">John Doe</span></div>
-      </div>
-      <div style="display:none" class="m-topbar">
-        <div style="cursor:pointer" onclick="showDash()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg></div>
-        <span style="font-size:.88rem;font-weight:600;margin-left:8px">Assignment Output</span>
-        <div class="m-sp"></div>
-      </div>
-      <div class="out-ai-bar">
-        <div class="out-ai-text" id="outAiText">Certainly! Here is your customized question paper:</div>
-        <button class="dl-btn" onclick="window.print()"><svg viewBox="0 0 24 24"><polyline points="8 17 12 21 16 17"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.88 18.09A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.29"/></svg>Download as PDF</button>
-      </div>
-      <div class="out-paper-wrap"><div class="out-paper" id="outPaper"></div></div>
-    </div>
+      /* ═══════════════ VIEWS ═══════════════ */
+      function switchView(id) {
+        document
+          .querySelectorAll(".view")
+          .forEach((v) => v.classList.remove("active"));
+        document.getElementById(id).classList.add("active");
+        // mobile topbar visibility
+        const mb = document.getElementById("mCreateBar");
+        if (mb) mb.style.display = id === "createView" ? "flex" : "none";
+      }
+      function showDash() {
+        switchView("dashView");
+        renderDash();
+      }
+      function goCreate() {
+        switchView("createView");
+        renderQTs();
+        const f = document.getElementById("fDue");
+        const fu = new Date();
+        fu.setDate(fu.getDate() + 14);
+        f.value = fu.toISOString().split("T")[0];
+        f.min = new Date().toISOString().split("T")[0];
+      }
+      function showSettings() {
+        switchView("settingsView");
+        document.getElementById("sName").value = schoolSettings.name;
+        document.getElementById("sLocation").value = schoolSettings.location;
+        document.getElementById("sBoard").value =
+          schoolSettings.board || "CBSE";
+        document.getElementById("sPrincipal").value =
+          schoolSettings.principal || "";
+        document.getElementById("sAddress").value =
+          schoolSettings.address || "";
+        document.getElementById("sEmail").value = schoolSettings.email || "";
+        document.getElementById("sPhone").value = schoolSettings.phone || "";
+        updatePreview();
+        // bind live preview
+        ["sName", "sLocation", "sAddress", "sEmail", "sPhone"].forEach((id) => {
+          document.getElementById(id).oninput = updatePreview;
+        });
+      }
+      function updatePreview() {
+        const n = document.getElementById("sName").value || "School Name";
+        const l = document.getElementById("sLocation").value;
+        document.getElementById("previewSchool").textContent = l
+          ? `${n}, ${l}`
+          : n;
+      }
+      function saveSettings() {
+        const n = document.getElementById("sName").value.trim();
+        const l = document.getElementById("sLocation").value.trim();
+        if (!n) {
+          toast("School name is required", "error");
+          return;
+        }
+        if (!l) {
+          toast("Location is required", "error");
+          return;
+        }
+        schoolSettings = {
+          name: n,
+          location: l,
+          board: document.getElementById("sBoard").value,
+          principal: document.getElementById("sPrincipal").value.trim(),
+          address: document.getElementById("sAddress").value.trim(),
+          email: document.getElementById("sEmail").value.trim(),
+          phone: document.getElementById("sPhone").value.trim(),
+        };
+        // persist to localStorage
+        localStorage.setItem("vedaai_school", JSON.stringify(schoolSettings));
+        // update sidebar
+        document.getElementById("sbSchoolName").textContent = n;
+        document.getElementById("sbSchoolCity").textContent = l;
+        toast("School settings saved!", "success");
+        setTimeout(() => showDash(), 800);
+      }
+      function setNav(el) {
+        document
+          .querySelectorAll(".sb-nav-item")
+          .forEach((n) => n.classList.remove("active"));
+        el.classList.add("active");
+      }
+      function mNav(n, el) {
+        document
+          .querySelectorAll(".m-nav-item")
+          .forEach((i) => i.classList.remove("active"));
+        el.classList.add("active");
+        if (n === "assign") showDash();
+      }
 
-    <!-- SETTINGS VIEW -->
-    <div class="view" id="settingsView">
-      <div class="topbar">
-        <div class="tb-back" onclick="showDash()"><svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg></div>
-        <div class="tb-bc"><span>School Settings</span><span class="fix-badge fix-new">new</span></div>
-        <div class="tb-sp"></div>
-        <div class="tb-user"><div class="tb-av"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><span class="tb-uname">John Doe</span></div>
-      </div>
-      <div class="settings-wrap">
-        <div class="settings-card">
-          <div class="settings-title">School Settings</div>
-          <div class="settings-sub">These details appear on every generated question paper header</div>
-          <div class="field"><label class="f-label">School Name *</label><input type="text" class="f-input" id="sName" placeholder="e.g. Delhi Public School"/></div>
-          <div class="field"><label class="f-label">Location / City *</label><input type="text" class="f-input" id="sLocation" placeholder="e.g. Sector-4, Bokaro Steel City"/></div>
-          <div class="f-row">
-            <div class="field">
-              <label class="f-label">Board Affiliation</label>
-              <select class="f-input" id="sBoard" style="appearance:none;cursor:pointer">
-                <option>CBSE</option><option>ICSE</option><option>State Board</option><option>IB</option><option>IGCSE</option><option>Other</option>
-              </select>
-            </div>
-            <div class="field"><label class="f-label">Principal Name</label><input type="text" class="f-input" id="sPrincipal" placeholder="Dr. A.K. Sharma"/></div>
-          </div>
-          <div class="field"><label class="f-label">Full Address</label><input type="text" class="f-input" id="sAddress" placeholder="Sector-4, Bokaro Steel City, Jharkhand – 827004"/></div>
-          <div class="f-row">
-            <div class="field"><label class="f-label">Email</label><input type="email" class="f-input" id="sEmail" placeholder="office@school.edu.in"/></div>
-            <div class="field"><label class="f-label">Phone</label><input type="text" class="f-input" id="sPhone" placeholder="+91 12345 67890"/></div>
-          </div>
-          <!-- Live preview -->
-          <div style="margin-top:6px">
-            <div class="preview-box">
-              <div class="preview-label">Paper Header Preview</div>
-              <div class="preview-school" id="previewSchool">Delhi Public School, Bokaro Steel City</div>
-              <div class="preview-meta" id="previewMeta">Subject: [Subject] &nbsp;|&nbsp; Class: [Grade]</div>
-            </div>
-          </div>
-          <button class="save-btn" onclick="saveSettings()"><svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Save Settings</button>
-        </div>
-      </div>
-    </div>
-
-  </div><!-- /main -->
-</div>
-
-<script>
-/* ═══════════════ STATE ═══════════════ */
-const TYPES = ['Multiple Choice Questions','Short Questions','Long Answer Questions','Diagram/Graph-Based Questions','Numerical Problems','True/False'];
-const SL = ['A','B','C','D','E','F'];
-const INSTR = {'Multiple Choice Questions':'Attempt all. Each question carries marks as indicated.','Short Questions':'Attempt all. Each answer should not exceed 3–4 lines.','Long Answer Questions':'Attempt any three. Support with suitable examples.','Diagram/Graph-Based Questions':'Draw neat and labelled diagrams.','Numerical Problems':'Show all working steps clearly.','True/False':'State whether True or False.'};
-let qTypes = [{t:'Multiple Choice Questions',n:4,m:1},{t:'Short Questions',n:3,m:2},{t:'Diagram/Graph-Based Questions',n:5,m:5},{t:'Numerical Problems',n:5,m:5}];
-let uploadedFile = null, fileTextContent = '';
-let assignments = [], currentAssessment = null, openCtx = null;
-let schoolSettings = {name:'Delhi Public School',location:'Bokaro Steel City',board:'CBSE',principal:'',address:'',email:'',phone:''};
-
-/* ═══════════════ VIEWS ═══════════════ */
-function switchView(id){
-  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  // mobile topbar visibility
-  const mb = document.getElementById('mCreateBar');
-  if(mb) mb.style.display = id==='createView'?'flex':'none';
-}
-function showDash(){switchView('dashView');renderDash();}
-function goCreate(){switchView('createView');renderQTs();const f=document.getElementById('fDue');const fu=new Date();fu.setDate(fu.getDate()+14);f.value=fu.toISOString().split('T')[0];f.min=new Date().toISOString().split('T')[0];}
-function showSettings(){
-  switchView('settingsView');
-  document.getElementById('sName').value=schoolSettings.name;
-  document.getElementById('sLocation').value=schoolSettings.location;
-  document.getElementById('sBoard').value=schoolSettings.board||'CBSE';
-  document.getElementById('sPrincipal').value=schoolSettings.principal||'';
-  document.getElementById('sAddress').value=schoolSettings.address||'';
-  document.getElementById('sEmail').value=schoolSettings.email||'';
-  document.getElementById('sPhone').value=schoolSettings.phone||'';
-  updatePreview();
-  // bind live preview
-  ['sName','sLocation','sAddress','sEmail','sPhone'].forEach(id=>{
-    document.getElementById(id).oninput=updatePreview;
-  });
-}
-function updatePreview(){
-  const n=document.getElementById('sName').value||'School Name';
-  const l=document.getElementById('sLocation').value;
-  document.getElementById('previewSchool').textContent=l?`${n}, ${l}`:n;
-}
-function saveSettings(){
-  const n=document.getElementById('sName').value.trim();
-  const l=document.getElementById('sLocation').value.trim();
-  if(!n){toast('School name is required','error');return;}
-  if(!l){toast('Location is required','error');return;}
-  schoolSettings={name:n,location:l,board:document.getElementById('sBoard').value,principal:document.getElementById('sPrincipal').value.trim(),address:document.getElementById('sAddress').value.trim(),email:document.getElementById('sEmail').value.trim(),phone:document.getElementById('sPhone').value.trim()};
-  // persist to localStorage
-  localStorage.setItem('vedaai_school',JSON.stringify(schoolSettings));
-  // update sidebar
-  document.getElementById('sbSchoolName').textContent=n;
-  document.getElementById('sbSchoolCity').textContent=l;
-  toast('School settings saved!','success');
-  setTimeout(()=>showDash(),800);
-}
-function setNav(el){document.querySelectorAll('.sb-nav-item').forEach(n=>n.classList.remove('active'));el.classList.add('active');}
-function mNav(n,el){document.querySelectorAll('.m-nav-item').forEach(i=>i.classList.remove('active'));el.classList.add('active');if(n==='assign')showDash();}
-
-/* ═══════════════ DASHBOARD ═══════════════ */
-function renderDash(){
-  const c=document.getElementById('dashContent');
-  const b=document.getElementById('sbBadge');
-  if(!assignments.length){
-    b.style.display='none';
-    c.innerHTML=`<div class="empty"><div style="margin-bottom:22px">${emptyIllustration()}</div><div class="empty-title">No assignments yet</div><div class="empty-desc">Create your first assignment to start collecting and grading student submissions. You can set up rubrics, define marking criteria, and let AI assist with grading.</div><button class="empty-btn" onclick="goCreate()"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>+ Create Your First Assignment</button></div>`;
-  } else {
-    b.style.display='block';b.textContent=assignments.length;
-    c.innerHTML=`
+      /* ═══════════════ DASHBOARD ═══════════════ */
+      function renderDash() {
+        const c = document.getElementById("dashContent");
+        const b = document.getElementById("sbBadge");
+        if (!assignments.length) {
+          b.style.display = "none";
+          c.innerHTML = `<div class="empty"><div style="margin-bottom:22px">${emptyIllustration()}</div><div class="empty-title">No assignments yet</div><div class="empty-desc">Create your first assignment to start collecting and grading student submissions. You can set up rubrics, define marking criteria, and let AI assist with grading.</div><button class="empty-btn" onclick="goCreate()"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>+ Create Your First Assignment</button></div>`;
+        } else {
+          b.style.display = "block";
+          b.textContent = assignments.length;
+          c.innerHTML = `
       <div class="pg-hdr"><div class="pg-hdr-row"><div class="pg-dot"></div><span class="pg-title">Assignments</span></div><span class="pg-sub">Manage and create assignments for your classes.</span></div>
       <div class="filter-bar"><button class="filter-btn"><svg viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>Filter By</button><div class="srch" style="margin-left:auto"><div class="srch-ico"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><input type="text" placeholder="Search Assignment" oninput="filterA(this.value)"/></div></div>
       <div class="assign-scroll"><div class="assign-grid" id="aGrid">${renderCards(assignments)}</div></div>
       <div class="fab-row"><button class="fab-btn" onclick="goCreate()"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>+ Create Assignment</button></div>`;
-  }
-}
-function renderCards(list){
-  return list.map((a,i)=>{
-    const asgn=new Date(a.createdAt).toLocaleDateString('en-GB').replace(/\//g,'-');
-    const due=new Date(a.dueDate).toLocaleDateString('en-GB').replace(/\//g,'-');
-    return `<div class="a-card fade-up" style="animation-delay:${i*.04}s" onclick="viewA('${a.id}')">
+        }
+      }
+      function renderCards(list) {
+        return list
+          .map((a, i) => {
+            const asgn = new Date(a.createdAt)
+              .toLocaleDateString("en-GB")
+              .replace(/\//g, "-");
+            const due = new Date(a.dueDate)
+              .toLocaleDateString("en-GB")
+              .replace(/\//g, "-");
+            return `<div class="a-card fade-up" style="animation-delay:${i * 0.04}s" onclick="viewA('${a.id}')">
       <div class="a-card-top"><div class="a-title">${esc(a.title)}</div>
       <div class="a-menu" onclick="toggleCtx(event,'ctx-${a.id}')"><svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="1" fill="currentColor"/><circle cx="12" cy="12" r="1" fill="currentColor"/><circle cx="12" cy="19" r="1" fill="currentColor"/></svg></div>
       <div class="ctx-menu" id="ctx-${a.id}"><div class="ctx-item" onclick="viewA('${a.id}')">View Assignment</div><div class="ctx-item danger" onclick="delA('${a.id}',event)">Delete</div></div></div>
       <div class="a-foot"><span>Assigned on : <strong>${asgn}</strong></span><span>Due : <strong>${due}</strong></span></div>
     </div>`;
-  }).join('');
-}
-function filterA(q){const g=document.getElementById('aGrid');if(!g)return;g.innerHTML=renderCards(assignments.filter(a=>a.title.toLowerCase().includes(q.toLowerCase())));}
-function toggleCtx(e,id){e.stopPropagation();if(openCtx&&openCtx!==id)document.getElementById(openCtx)?.classList.remove('open');const el=document.getElementById(id);if(el){el.classList.toggle('open');openCtx=el.classList.contains('open')?id:null;}}
-document.addEventListener('click',()=>{if(openCtx){document.getElementById(openCtx)?.classList.remove('open');openCtx=null;}});
-function delA(id,e){e.stopPropagation();assignments=assignments.filter(a=>a.id!==id);renderDash();toast('Assignment deleted','success');}
-function viewA(id){const a=assignments.find(x=>x.id===id);if(a?.assessment&&currentAssessment?._id===a.assessment._id)showOutput(a.assessment,a);}
+          })
+          .join("");
+      }
+      function filterA(q) {
+        const g = document.getElementById("aGrid");
+        if (!g) return;
+        g.innerHTML = renderCards(
+          assignments.filter((a) =>
+            a.title.toLowerCase().includes(q.toLowerCase()),
+          ),
+        );
+      }
+      function toggleCtx(e, id) {
+        e.stopPropagation();
+        if (openCtx && openCtx !== id)
+          document.getElementById(openCtx)?.classList.remove("open");
+        const el = document.getElementById(id);
+        if (el) {
+          el.classList.toggle("open");
+          openCtx = el.classList.contains("open") ? id : null;
+        }
+      }
+      document.addEventListener("click", () => {
+        if (openCtx) {
+          document.getElementById(openCtx)?.classList.remove("open");
+          openCtx = null;
+        }
+      });
+      function delA(id, e) {
+        e.stopPropagation();
+        assignments = assignments.filter((a) => a.id !== id);
+        renderDash();
+        toast("Assignment deleted", "success");
+      }
+      function viewA(id) {
+        const a = assignments.find((x) => x.id === id);
+        if (a?.assessment && currentAssessment?._id === a.assessment._id)
+          showOutput(a.assessment, a);
+      }
 
-/* ═══════════════ FILE UPLOAD — KEY FIX ═══════════════ */
-function handleFileSelect(e){const f=e.target.files[0];if(f)processFile(f);}
-function handleDrop(e){e.preventDefault();document.getElementById('uploadZone').classList.remove('drag');const f=e.dataTransfer.files[0];if(f)processFile(f);}
+      /* ═══════════════ FILE UPLOAD — KEY FIX ═══════════════ */
+      function handleFileSelect(e) {
+        const f = e.target.files[0];
+        if (f) processFile(f);
+      }
+      function handleDrop(e) {
+        e.preventDefault();
+        document.getElementById("uploadZone").classList.remove("drag");
+        const f = e.dataTransfer.files[0];
+        if (f) processFile(f);
+      }
 
-function processFile(file){
-  uploadedFile=file;
-  const allowedTypes=['application/pdf','text/plain','image/jpeg','image/png','image/jpg'];
-  if(!allowedTypes.includes(file.type)){toast('Use PDF, TXT, JPG or PNG','error');return;}
+      function processFile(file) {
+        uploadedFile = file;
+        const allowedTypes = [
+          "application/pdf",
+          "text/plain",
+          "image/jpeg",
+          "image/png",
+          "image/jpg",
+        ];
+        if (!allowedTypes.includes(file.type)) {
+          toast("Use PDF, TXT, JPG or PNG", "error");
+          return;
+        }
 
-  const reader=new FileReader();
+        const reader = new FileReader();
 
-  if(file.type==='text/plain'){
-    reader.onload=e=>{
-      fileTextContent=e.target.result;
-      showFileDisplay(file.name,fileTextContent);
-    };
-    reader.readAsText(file);
-  } else if(file.type==='application/pdf'){
-    // In a real backend, pdf-parse extracts the text.
-    // In this HTML demo, we show the filename and note that backend will extract text.
-    fileTextContent=`[PDF: ${file.name} — backend will extract text with pdf-parse and send to AI]`;
-    showFileDisplay(file.name,fileTextContent);
-    toast('PDF uploaded — backend will extract text for AI','info');
-  } else {
-    // Image
-    fileTextContent=`[Image: ${file.name} — backend will send to AI with vision context]`;
-    showFileDisplay(file.name,fileTextContent);
-    toast('Image uploaded — AI will use as reference context','info');
-  }
-}
+        if (file.type === "text/plain") {
+          reader.onload = (e) => {
+            fileTextContent = e.target.result;
+            showFileDisplay(file.name, fileTextContent);
+          };
+          reader.readAsText(file);
+        } else if (file.type === "application/pdf") {
+          // In a real backend, pdf-parse extracts the text.
+          // In this HTML demo, we show the filename and note that backend will extract text.
+          fileTextContent = `[PDF: ${file.name} — backend will extract text with pdf-parse and send to AI]`;
+          showFileDisplay(file.name, fileTextContent);
+          toast("PDF uploaded — backend will extract text for AI", "info");
+        } else {
+          // Image
+          fileTextContent = `[Image: ${file.name} — backend will send to AI with vision context]`;
+          showFileDisplay(file.name, fileTextContent);
+          toast("Image uploaded — AI will use as reference context", "info");
+        }
+      }
 
-function showFileDisplay(name,content){
-  document.getElementById('uploadDisplay').innerHTML=`
+      function showFileDisplay(name, content) {
+        document.getElementById("uploadDisplay").innerHTML = `
     <div class="file-display">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
       ${esc(name)}
       <button class="file-clear" onclick="clearFile(event)"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>`;
-  const pw=document.getElementById('filePreviewWrap');
-  const pt=document.getElementById('filePreviewText');
-  pw.style.display='block';
-  pt.textContent=content.substring(0,400)+(content.length>400?'\n...(truncated)':'');
-}
-function clearFile(e){
-  e.stopPropagation();uploadedFile=null;fileTextContent='';
-  document.getElementById('uploadDisplay').innerHTML=`
+        const pw = document.getElementById("filePreviewWrap");
+        const pt = document.getElementById("filePreviewText");
+        pw.style.display = "block";
+        pt.textContent =
+          content.substring(0, 400) +
+          (content.length > 400 ? "\n...(truncated)" : "");
+      }
+      function clearFile(e) {
+        e.stopPropagation();
+        uploadedFile = null;
+        fileTextContent = "";
+        document.getElementById("uploadDisplay").innerHTML = `
     <div class="upload-icon"><svg viewBox="0 0 24 24"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg></div>
     <div class="upload-text">Choose a file or drag & drop</div>
     <div class="upload-hint">PDF, TXT — AI will generate questions FROM this content</div>
     <span class="browse-btn">Browse Files</span>`;
-  document.getElementById('filePreviewWrap').style.display='none';
-  document.getElementById('fileInput').value='';
-}
+        document.getElementById("filePreviewWrap").style.display = "none";
+        document.getElementById("fileInput").value = "";
+      }
 
-/* ═══════════════ QUESTION TYPES ═══════════════ */
-function renderQTs(){
-  const w=document.getElementById('qtRows');w.innerHTML='';
-  qTypes.forEach((q,i)=>{
-    const r=document.createElement('div');r.className='qt-row';
-    r.innerHTML=`<div class="qt-sel-wrap"><select class="qt-sel" onchange="updQT(${i},'t',this.value)">${TYPES.map(t=>`<option value="${t}" ${q.t===t?'selected':''}>${t}</option>`).join('')}</select><div class="qt-x" onclick="rmQT(${i})">×</div></div><div class="num-ctrl"><button class="num-btn" onclick="updQT(${i},'n',${Math.max(1,q.n-1)})">−</button><input class="num-inp" type="number" min="1" value="${q.n}" oninput="updQT(${i},'n',+this.value||1)"/><button class="num-btn" onclick="updQT(${i},'n',${q.n+1})">+</button></div><div class="num-ctrl"><button class="num-btn" onclick="updQT(${i},'m',${Math.max(1,q.m-1)})">−</button><input class="num-inp" type="number" min="1" value="${q.m}" oninput="updQT(${i},'m',+this.value||1)"/><button class="num-btn" onclick="updQT(${i},'m',${q.m+1})">+</button></div>`;
-    w.appendChild(r);
-  });
-  updTotals();
-}
-function addQT(){if(qTypes.length>=6)return;qTypes.push({t:'Long Answer Questions',n:3,m:5});renderQTs();}
-function rmQT(i){if(qTypes.length<=1)return;qTypes.splice(i,1);renderQTs();}
-function updQT(i,k,v){qTypes[i][k]=k==='t'?v:Math.max(1,v||1);updTotals();}
-function updTotals(){document.getElementById('totQ').textContent=qTypes.reduce((s,q)=>s+q.n,0);document.getElementById('totM').textContent=qTypes.reduce((s,q)=>s+q.n*q.m,0);}
+      /* ═══════════════ QUESTION TYPES ═══════════════ */
+      function renderQTs() {
+        const w = document.getElementById("qtRows");
+        w.innerHTML = "";
+        qTypes.forEach((q, i) => {
+          const r = document.createElement("div");
+          r.className = "qt-row";
+          r.innerHTML = `<div class="qt-sel-wrap"><select class="qt-sel" onchange="updQT(${i},'t',this.value)">${TYPES.map((t) => `<option value="${t}" ${q.t === t ? "selected" : ""}>${t}</option>`).join("")}</select><div class="qt-x" onclick="rmQT(${i})">×</div></div><div class="num-ctrl"><button class="num-btn" onclick="updQT(${i},'n',${Math.max(1, q.n - 1)})">−</button><input class="num-inp" type="number" min="1" value="${q.n}" oninput="updQT(${i},'n',+this.value||1)"/><button class="num-btn" onclick="updQT(${i},'n',${q.n + 1})">+</button></div><div class="num-ctrl"><button class="num-btn" onclick="updQT(${i},'m',${Math.max(1, q.m - 1)})">−</button><input class="num-inp" type="number" min="1" value="${q.m}" oninput="updQT(${i},'m',+this.value||1)"/><button class="num-btn" onclick="updQT(${i},'m',${q.m + 1})">+</button></div>`;
+          w.appendChild(r);
+        });
+        updTotals();
+      }
+      function addQT() {
+        if (qTypes.length >= 6) return;
+        qTypes.push({ t: "Long Answer Questions", n: 3, m: 5 });
+        renderQTs();
+      }
+      function rmQT(i) {
+        if (qTypes.length <= 1) return;
+        qTypes.splice(i, 1);
+        renderQTs();
+      }
+      function updQT(i, k, v) {
+        qTypes[i][k] = k === "t" ? v : Math.max(1, v || 1);
+        updTotals();
+      }
+      function updTotals() {
+        document.getElementById("totQ").textContent = qTypes.reduce(
+          (s, q) => s + q.n,
+          0,
+        );
+        document.getElementById("totM").textContent = qTypes.reduce(
+          (s, q) => s + q.n * q.m,
+          0,
+        );
+      }
 
-/* ═══════════════ VALIDATION ═══════════════ */
-function validate(){
-  let ok=true;
-  const S=(id,fid)=>{const e=document.getElementById(id);e.classList.add('show');e.style.display='block';if(fid)document.getElementById(fid).classList.add('err');ok=false;};
-  const H=(id,fid)=>{const e=document.getElementById(id);e.classList.remove('show');e.style.display='none';if(fid)document.getElementById(fid).classList.remove('err');};
-  const t=document.getElementById('fTitle').value.trim();
-  const s=document.getElementById('fSubject').value.trim();
-  const g=document.getElementById('fGrade').value.trim();
-  const d=document.getElementById('fDue').value;
-  t?H('errTitle','fTitle'):S('errTitle','fTitle');
-  s?H('errSubject','fSubject'):S('errSubject','fSubject');
-  g?H('errGrade','fGrade'):S('errGrade','fGrade');
-  if(!d)S('errDue','fDue');
-  else if(new Date(d)<new Date())S('errDue','fDue');
-  else H('errDue','fDue');
-  return ok;
-}
+      /* ═══════════════ VALIDATION ═══════════════ */
+      function validate() {
+        let ok = true;
+        const S = (id, fid) => {
+          const e = document.getElementById(id);
+          e.classList.add("show");
+          e.style.display = "block";
+          if (fid) document.getElementById(fid).classList.add("err");
+          ok = false;
+        };
+        const H = (id, fid) => {
+          const e = document.getElementById(id);
+          e.classList.remove("show");
+          e.style.display = "none";
+          if (fid) document.getElementById(fid).classList.remove("err");
+        };
+        const t = document.getElementById("fTitle").value.trim();
+        const s = document.getElementById("fSubject").value.trim();
+        const g = document.getElementById("fGrade").value.trim();
+        const d = document.getElementById("fDue").value;
+        t ? H("errTitle", "fTitle") : S("errTitle", "fTitle");
+        s ? H("errSubject", "fSubject") : S("errSubject", "fSubject");
+        g ? H("errGrade", "fGrade") : S("errGrade", "fGrade");
+        if (!d) S("errDue", "fDue");
+        else if (new Date(d) < new Date()) S("errDue", "fDue");
+        else H("errDue", "fDue");
+        return ok;
+      }
 
-/* ═══════════════ PROCESSING STEPS ═══════════════ */
-const STEPS=[
-  {svg:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>`,label:'Connected to server',t:10},
-  {svg:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`,label:'Building AI prompt with file content',t:30},
-  {svg:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`,label:'Generating questions from material',t:65},
-  {svg:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>`,label:'Saving to database',t:88},
-  {svg:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>`,label:'Completed',t:100},
-];
-function renderProcSteps(pct){
-  document.getElementById('procSteps').innerHTML=STEPS.map((s,i)=>{
-    const done=pct>=s.t,active=!done&&pct>=(STEPS[i-1]?.t??0),cls=done?'done':active?'active':'idle';
-    return `<div class="p-step"><div class="p-step-icon ${cls}">${s.svg}</div><span class="p-step-text ${cls}">${s.label}</span><div class="p-step-chk ${done?'show':''}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div></div>`;
-  }).join('');
-}
-function setProc(pct,msg){
-  document.getElementById('procBar').style.width=pct+'%';
-  document.getElementById('procPct').textContent=pct+'%';
-  document.getElementById('procMsg').textContent=msg;
-  renderProcSteps(pct);
-}
+      /* ═══════════════ PROCESSING STEPS ═══════════════ */
+      const STEPS = [
+        {
+          svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>`,
+          label: "Connected to server",
+          t: 10,
+        },
+        {
+          svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`,
+          label: "Building AI prompt with file content",
+          t: 30,
+        },
+        {
+          svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`,
+          label: "Generating questions from material",
+          t: 65,
+        },
+        {
+          svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>`,
+          label: "Saving to database",
+          t: 88,
+        },
+        {
+          svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>`,
+          label: "Completed",
+          t: 100,
+        },
+      ];
+      function renderProcSteps(pct) {
+        document.getElementById("procSteps").innerHTML = STEPS.map((s, i) => {
+          const done = pct >= s.t,
+            active = !done && pct >= (STEPS[i - 1]?.t ?? 0),
+            cls = done ? "done" : active ? "active" : "idle";
+          return `<div class="p-step"><div class="p-step-icon ${cls}">${s.svg}</div><span class="p-step-text ${cls}">${s.label}</span><div class="p-step-chk ${done ? "show" : ""}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div></div>`;
+        }).join("");
+      }
+      function setProc(pct, msg) {
+        document.getElementById("procBar").style.width = pct + "%";
+        document.getElementById("procPct").textContent = pct + "%";
+        document.getElementById("procMsg").textContent = msg;
+        renderProcSteps(pct);
+      }
 
-/* ═══════════════ GENERATE ═══════════════ */
-async function handleGenerate(){
-  if(!validate())return;
-  const btn=document.getElementById('nextBtn');
-  btn.disabled=true;btn.textContent='Generating...';
-  const title=document.getElementById('fTitle').value.trim();
-  const subject=document.getElementById('fSubject').value.trim();
-  const grade=document.getElementById('fGrade').value.trim();
-  const dueDate=document.getElementById('fDue').value;
-  const info=document.getElementById('fInfo').value.trim();
-  const id='a-'+Date.now();
-  const newA={id,title,subject,grade,dueDate,fileText:fileTextContent,info,status:'processing',createdAt:new Date().toISOString()};
-  assignments.unshift(newA);
-  switchView('procView');
-  document.getElementById('procTitle').textContent='Generating Paper';
-  document.getElementById('procId').textContent='ID: '+id;
-  setProc(0,'Connecting...');
-  await sl(500);setProc(10,'Connected — analysing assignment...');
-  await sl(800);setProc(25,'Building AI prompt'+(fileTextContent?' with uploaded file content':'')+'...');
-  await sl(1100);setProc(40,'Generating questions'+(fileTextContent?' based on uploaded material':'')+'...');
-  await sl(2200);setProc(65,'Parsing and validating response...');
-  await sl(700);setProc(80,'Structuring sections...');
-  await sl(500);setProc(88,'Saving to database...');
-  await sl(500);setProc(100,'Paper ready!');
-  document.getElementById('procTitle').textContent='Paper Ready!';
-  document.getElementById('procRing').style.borderTopColor='#22c55e';
-  document.getElementById('procRing').style.animationDuration='0s';
-  document.getElementById('procIcon').innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>`;
-  await sl(900);
-  const assessment=makeAssessment(title,subject,grade,qTypes,fileTextContent,info);
-  newA.status='completed';newA.assessment=assessment;
-  currentAssessment=assessment;
-  showOutput(assessment,newA);
-  renderDash();
-  btn.disabled=false;btn.innerHTML='Generate Paper <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" width="13" height="13"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>';
-  toast('Question paper generated!','success');
-}
-const sl=ms=>new Promise(r=>setTimeout(r,ms));
+      /* ═══════════════ GENERATE ═══════════════ */
+      async function handleGenerate() {
+        if (!validate()) return;
+        const btn = document.getElementById("nextBtn");
+        btn.disabled = true;
+        btn.textContent = "Generating...";
+        const title = document.getElementById("fTitle").value.trim();
+        const subject = document.getElementById("fSubject").value.trim();
+        const grade = document.getElementById("fGrade").value.trim();
+        const dueDate = document.getElementById("fDue").value;
+        const info = document.getElementById("fInfo").value.trim();
+        const id = "a-" + Date.now();
+        const newA = {
+          id,
+          title,
+          subject,
+          grade,
+          dueDate,
+          fileText: fileTextContent,
+          info,
+          status: "processing",
+          createdAt: new Date().toISOString(),
+        };
+        assignments.unshift(newA);
+        switchView("procView");
+        document.getElementById("procTitle").textContent = "Generating Paper";
+        document.getElementById("procId").textContent = "ID: " + id;
+        setProc(0, "Connecting...");
+        await sl(500);
+        setProc(10, "Connected — analysing assignment...");
+        await sl(800);
+        setProc(
+          25,
+          "Building AI prompt" +
+            (fileTextContent ? " with uploaded file content" : "") +
+            "...",
+        );
+        await sl(1100);
+        setProc(
+          40,
+          "Generating questions" +
+            (fileTextContent ? " based on uploaded material" : "") +
+            "...",
+        );
+        await sl(2200);
+        setProc(65, "Parsing and validating response...");
+        await sl(700);
+        setProc(80, "Structuring sections...");
+        await sl(500);
+        setProc(88, "Saving to database...");
+        await sl(500);
+        setProc(100, "Paper ready!");
+        document.getElementById("procTitle").textContent = "Paper Ready!";
+        document.getElementById("procRing").style.borderTopColor = "#22c55e";
+        document.getElementById("procRing").style.animationDuration = "0s";
+        document.getElementById("procIcon").innerHTML =
+          `<svg viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>`;
+        await sl(900);
+        const assessment = makeAssessment(
+          title,
+          subject,
+          grade,
+          qTypes,
+          fileTextContent,
+          info,
+        );
+        newA.status = "completed";
+        newA.assessment = assessment;
+        currentAssessment = assessment;
+        showOutput(assessment, newA);
+        renderDash();
+        btn.disabled = false;
+        btn.innerHTML =
+          'Generate Paper <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" width="13" height="13"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>';
+        toast("Question paper generated!", "success");
+      }
+      const sl = (ms) => new Promise((r) => setTimeout(r, ms));
 
-/* ═══════════════ MOCK ASSESSMENT — uses file content ═══════════════ */
-/* In real app: Claude API receives the file content and generates these.
+      /* ═══════════════ MOCK ASSESSMENT — uses file content ═══════════════ */
+      /* In real app: Claude API receives the file content and generates these.
    Here we show questions that REFERENCE the uploaded content if present. */
-function makeAssessment(title,subject,grade,cfg,fileContent,extraInstr){
-  const hasFile=fileContent&&fileContent.trim().length>0;
-  // If TXT file was uploaded, extract some key words to personalise questions
-  const fileWords = hasFile && fileContent.startsWith('[')===false
-    ? fileContent.replace(/[^a-zA-Z0-9 ]/g,' ').split(/\s+/).filter(w=>w.length>5).slice(0,10)
-    : [];
+      function makeAssessment(
+        title,
+        subject,
+        grade,
+        cfg,
+        fileContent,
+        extraInstr,
+      ) {
+        const hasFile = fileContent && fileContent.trim().length > 0;
+        // If TXT file was uploaded, extract some key words to personalise questions
+        const fileWords =
+          hasFile && fileContent.startsWith("[") === false
+            ? fileContent
+                .replace(/[^a-zA-Z0-9 ]/g, " ")
+                .split(/\s+/)
+                .filter((w) => w.length > 5)
+                .slice(0, 10)
+            : [];
 
-  const SAMPLES = {
-    'Multiple Choice Questions': fileWords.length>0?[
-      `According to the material, which of the following best describes "${fileWords[0]||'the concept'}"?`,
-      `Based on the uploaded content, what is the primary function of "${fileWords[1]||'the element'}"?`,
-      `The material mentions "${fileWords[2]||'this topic'}". Which statement about it is correct?`,
-      `Which of the following is NOT mentioned in the reference material?`,
-    ]:[
-      'Which of the following is a good conductor of electricity?',
-      'The SI unit of electric current is:',
-      'Electroplating uses which type of current?',
-      'What happens at the cathode during electrolysis?',
-    ],
-    'Short Questions': fileWords.length>0?[
-      `Briefly explain the concept of "${fileWords[0]||'the topic'}" as described in the material.`,
-      `What is the significance of "${fileWords[1]||'this element'}" according to the reference text?`,
-      `Describe the relationship between "${fileWords[2]||'concept A'}" and "${fileWords[3]||'concept B'}" from the material.`,
-      `List any three key points from the uploaded content about ${subject}.`,
-    ]:[
-      'Define electroplating. Explain its purpose.',
-      'What is the role of a conductor in electrolysis?',
-      'Why does copper sulfate solution conduct electricity?',
-      'Describe the chemical effect of electric current in daily life.',
-      'Explain why electric current is said to have chemical effects.',
-    ],
-    'Long Answer Questions': fileWords.length>0?[
-      `Using the reference material as a guide, explain in detail the concept of "${fileWords[0]||'the main topic'}" and its applications.`,
-      `Discuss the key ideas presented in the uploaded material about ${subject}. Provide examples.`,
-      `Compare and contrast the main topics from the reference material. How are they relevant to ${grade} ${subject}?`,
-    ]:[
-      'Discuss major applications of electrolysis in industry.',
-      'Explain the construction and working of a simple electric motor.',
-      'Describe electroplating with a suitable example and diagram.',
-    ],
-    'Diagram/Graph-Based Questions': [
-      `Draw a labelled diagram illustrating the main concept from the uploaded material.`,
-      'Draw a labelled diagram of the electrolysis of water. Name the gases evolved.',
-      'Illustrate the circuit used in electroplating. Label all components.',
-      'Sketch the setup used to demonstrate the magnetic effect of current.',
-      'Diagram the process of copper deposition during electroplating.',
-    ],
-    'Numerical Problems': [
-      'Calculate the resistance of a wire if the voltage is 12V and current is 3A.',
-      'A current of 2A flows through a 5Ω resistor. Find the voltage.',
-      'How much charge passes through a circuit if 4A flows for 10 seconds?',
-      'Find the power consumed by a 100Ω bulb connected to 220V.',
-      'A battery supplies 24V across two equal resistors in series. Find voltage across each.',
-    ],
-    'True/False': fileWords.length>0?[
-      `"${fileWords[0]||'The main concept'}" is described in the uploaded material. [True/False]`,
-      `The uploaded content mentions "${fileWords[1]||'this element'}" in the context of ${subject}. [True/False]`,
-      `According to the reference material, "${fileWords[2]||'this process'}" is relevant to ${grade}. [True/False]`,
-      `The material explicitly covers ${subject} concepts for ${grade} level. [True/False]`,
-    ]:[
-      'The electrolysis of water produces hydrogen at the cathode. [True/False]',
-      'Copper is deposited at the cathode during copper electroplating. [True/False]',
-      'Distilled water is a good conductor of electricity. [True/False]',
-      'Electroplating can be used to prevent rusting of iron. [True/False]',
-    ],
-  };
-  const DIFF=['easy','medium','medium','hard'];
-  const sections=cfg.map((c,i)=>{
-    const pool=SAMPLES[c.t]||SAMPLES['Short Questions'];
-    return {
-      id:`s${i}`,letter:SL[i],type:c.t,instr:INSTR[c.t]||'Attempt all questions.',marks:c.n*c.m,
-      qs:Array.from({length:c.n},(_,qi)=>({id:`q${i}-${qi}`,text:pool[qi%pool.length],diff:DIFF[qi%4],m:c.m})),
-    };
-  });
-  return {
-    _id:'asr-'+Date.now(),title,subject,grade,
-    totalMarks:sections.reduce((s,sec)=>s+sec.marks,0),
-    sections,basedOnFile:hasFile,
-  };
-}
+        const SAMPLES = {
+          "Multiple Choice Questions":
+            fileWords.length > 0
+              ? [
+                  `According to the material, which of the following best describes "${fileWords[0] || "the concept"}"?`,
+                  `Based on the uploaded content, what is the primary function of "${fileWords[1] || "the element"}"?`,
+                  `The material mentions "${fileWords[2] || "this topic"}". Which statement about it is correct?`,
+                  `Which of the following is NOT mentioned in the reference material?`,
+                ]
+              : [
+                  "Which of the following is a good conductor of electricity?",
+                  "The SI unit of electric current is:",
+                  "Electroplating uses which type of current?",
+                  "What happens at the cathode during electrolysis?",
+                ],
+          "Short Questions":
+            fileWords.length > 0
+              ? [
+                  `Briefly explain the concept of "${fileWords[0] || "the topic"}" as described in the material.`,
+                  `What is the significance of "${fileWords[1] || "this element"}" according to the reference text?`,
+                  `Describe the relationship between "${fileWords[2] || "concept A"}" and "${fileWords[3] || "concept B"}" from the material.`,
+                  `List any three key points from the uploaded content about ${subject}.`,
+                ]
+              : [
+                  "Define electroplating. Explain its purpose.",
+                  "What is the role of a conductor in electrolysis?",
+                  "Why does copper sulfate solution conduct electricity?",
+                  "Describe the chemical effect of electric current in daily life.",
+                  "Explain why electric current is said to have chemical effects.",
+                ],
+          "Long Answer Questions":
+            fileWords.length > 0
+              ? [
+                  `Using the reference material as a guide, explain in detail the concept of "${fileWords[0] || "the main topic"}" and its applications.`,
+                  `Discuss the key ideas presented in the uploaded material about ${subject}. Provide examples.`,
+                  `Compare and contrast the main topics from the reference material. How are they relevant to ${grade} ${subject}?`,
+                ]
+              : [
+                  "Discuss major applications of electrolysis in industry.",
+                  "Explain the construction and working of a simple electric motor.",
+                  "Describe electroplating with a suitable example and diagram.",
+                ],
+          "Diagram/Graph-Based Questions": [
+            `Draw a labelled diagram illustrating the main concept from the uploaded material.`,
+            "Draw a labelled diagram of the electrolysis of water. Name the gases evolved.",
+            "Illustrate the circuit used in electroplating. Label all components.",
+            "Sketch the setup used to demonstrate the magnetic effect of current.",
+            "Diagram the process of copper deposition during electroplating.",
+          ],
+          "Numerical Problems": [
+            "Calculate the resistance of a wire if the voltage is 12V and current is 3A.",
+            "A current of 2A flows through a 5Ω resistor. Find the voltage.",
+            "How much charge passes through a circuit if 4A flows for 10 seconds?",
+            "Find the power consumed by a 100Ω bulb connected to 220V.",
+            "A battery supplies 24V across two equal resistors in series. Find voltage across each.",
+          ],
+          "True/False":
+            fileWords.length > 0
+              ? [
+                  `"${fileWords[0] || "The main concept"}" is described in the uploaded material. [True/False]`,
+                  `The uploaded content mentions "${fileWords[1] || "this element"}" in the context of ${subject}. [True/False]`,
+                  `According to the reference material, "${fileWords[2] || "this process"}" is relevant to ${grade}. [True/False]`,
+                  `The material explicitly covers ${subject} concepts for ${grade} level. [True/False]`,
+                ]
+              : [
+                  "The electrolysis of water produces hydrogen at the cathode. [True/False]",
+                  "Copper is deposited at the cathode during copper electroplating. [True/False]",
+                  "Distilled water is a good conductor of electricity. [True/False]",
+                  "Electroplating can be used to prevent rusting of iron. [True/False]",
+                ],
+        };
+        const DIFF = ["easy", "medium", "medium", "hard"];
+        const sections = cfg.map((c, i) => {
+          const pool = SAMPLES[c.t] || SAMPLES["Short Questions"];
+          return {
+            id: `s${i}`,
+            letter: SL[i],
+            type: c.t,
+            instr: INSTR[c.t] || "Attempt all questions.",
+            marks: c.n * c.m,
+            qs: Array.from({ length: c.n }, (_, qi) => ({
+              id: `q${i}-${qi}`,
+              text: pool[qi % pool.length],
+              diff: DIFF[qi % 4],
+              m: c.m,
+            })),
+          };
+        });
+        return {
+          _id: "asr-" + Date.now(),
+          title,
+          subject,
+          grade,
+          totalMarks: sections.reduce((s, sec) => s + sec.marks, 0),
+          sections,
+          basedOnFile: hasFile,
+        };
+      }
 
-/* ═══════════════ SHOW OUTPUT ═══════════════ */
-function showOutput(a,assign){
-  switchView('outputView');
-  const schoolLine=[schoolSettings.name,schoolSettings.location].filter(Boolean).join(', ');
-  const aiMsg=a.basedOnFile
-    ?`Questions generated from uploaded file content for ${a.grade} ${a.subject}:`
-    :`Question paper generated for your ${a.grade} ${a.subject} class:`;
-  document.getElementById('outAiText').textContent=aiMsg;
-  document.getElementById('outPaper').innerHTML=`
+      /* ═══════════════ SHOW OUTPUT ═══════════════ */
+      function showOutput(a, assign) {
+        switchView("outputView");
+        const schoolLine = [schoolSettings.name, schoolSettings.location]
+          .filter(Boolean)
+          .join(", ");
+        const aiMsg = a.basedOnFile
+          ? `Questions generated from uploaded file content for ${a.grade} ${a.subject}:`
+          : `Question paper generated for your ${a.grade} ${a.subject} class:`;
+        document.getElementById("outAiText").textContent = aiMsg;
+        document.getElementById("outPaper").innerHTML = `
     <div class="paper-school">${esc(schoolLine)}</div>
-    ${schoolSettings.address?`<div style="text-align:center;font-size:.72rem;color:#666;margin-bottom:2px">${esc(schoolSettings.address)}</div>`:''}
+    ${schoolSettings.address ? `<div style="text-align:center;font-size:.72rem;color:#666;margin-bottom:2px">${esc(schoolSettings.address)}</div>` : ""}
     <div class="paper-subj">Subject: ${esc(a.subject)}</div>
     <div class="paper-cls">Class: ${esc(a.grade)}</div>
     <div class="paper-hr"></div>
-    <div class="paper-meta"><span>Time Allowed: ${Math.max(30,a.totalMarks*2)} minutes</span><span>Maximum Marks: ${a.totalMarks}</span></div>
-    ${a.basedOnFile?'<div style="font-size:.72rem;color:#059669;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:4px;padding:5px 10px;margin:8px 0;text-align:center">✓ Questions generated from uploaded reference material</div>':''}
+    <div class="paper-meta"><span>Time Allowed: ${Math.max(30, a.totalMarks * 2)} minutes</span><span>Maximum Marks: ${a.totalMarks}</span></div>
+    ${a.basedOnFile ? '<div style="font-size:.72rem;color:#059669;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:4px;padding:5px 10px;margin:8px 0;text-align:center">✓ Questions generated from uploaded reference material</div>' : ""}
     <div class="paper-instr">All questions are compulsory unless stated otherwise.</div>
     <div class="paper-student">
       <div class="paper-student-row">Name: <div class="paper-line"></div></div>
       <div class="paper-student-row">Roll Number: <div class="paper-line" style="min-width:80px"></div></div>
       <div class="paper-student-row">Class: ${esc(a.grade)} Section: <div class="paper-line" style="min-width:60px"></div></div>
     </div>
-    ${a.sections.map(sec=>`
+    ${a.sections
+      .map(
+        (sec) => `
       <div class="sec-title">Section ${sec.letter}</div>
       <div class="sec-type">${sec.type}</div>
       <div class="sec-instr">${sec.instr}</div>
       <div style="margin-bottom:10px">
-        ${sec.qs.map((q,qi)=>`<div class="q-item"><span class="q-num">${qi+1}.</span><span><span class="diff-tag diff-${q.diff}">${q.diff}</span>${esc(q.text)} [${q.m} ${q.m===1?'Mark':'Marks'}]</span></div>`).join('')}
+        ${sec.qs.map((q, qi) => `<div class="q-item"><span class="q-num">${qi + 1}.</span><span><span class="diff-tag diff-${q.diff}">${q.diff}</span>${esc(q.text)} [${q.m} ${q.m === 1 ? "Mark" : "Marks"}]</span></div>`).join("")}
       </div>
-    `).join('<div class="paper-hr"></div>')}
+    `,
+      )
+      .join('<div class="paper-hr"></div>')}
     <div class="paper-end">End of Question Paper</div>
     <div class="paper-hr"></div>
     <div style="font-size:.78rem;font-weight:700;color:#111;margin-top:12px">Answer Key:</div>
-    ${a.sections.flatMap((sec,si)=>sec.qs.map((q,qi)=>`<div class="q-item"><span class="q-num" style="font-weight:500">${si*10+qi+1}.</span><span>${esc(q.text.substring(0,60))}... — Refer to ${a.basedOnFile?'uploaded material and ':''} textbook chapter notes.</span></div>`)).join('')}`;
-}
+    ${a.sections.flatMap((sec, si) => sec.qs.map((q, qi) => `<div class="q-item"><span class="q-num" style="font-weight:500">${si * 10 + qi + 1}.</span><span>${esc(q.text.substring(0, 60))}... — Refer to ${a.basedOnFile ? "uploaded material and " : ""} textbook chapter notes.</span></div>`)).join("")}`;
+      }
 
-/* ═══════════════ EMPTY ILLUSTRATION ═══════════════ */
-function emptyIllustration(){
-  return`<svg viewBox="0 0 220 190" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:190px;height:165px"><circle cx="110" cy="95" r="76" fill="#e8e8e8"/><rect x="76" y="32" width="72" height="94" rx="6" fill="white" stroke="#d4d4d4" stroke-width="1.5"/><rect x="76" y="32" width="72" height="15" rx="5" fill="#4a4a4a"/><rect x="86" y="56" width="42" height="4" rx="2" fill="#d0d0d0"/><rect x="86" y="65" width="34" height="4" rx="2" fill="#ddd"/><rect x="86" y="74" width="38" height="4" rx="2" fill="#ddd"/><rect x="86" y="83" width="30" height="4" rx="2" fill="#ddd"/><circle cx="124" cy="116" r="32" fill="white" stroke="#d4d4d4" stroke-width="2"/><circle cx="117" cy="109" r="19" fill="#f0f0f0" stroke="#d4d4d4" stroke-width="1.5"/><circle cx="117" cy="109" r="13" fill="#fee2e2"/><line x1="111" y1="103" x2="123" y2="115" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round"/><line x1="123" y1="103" x2="111" y2="115" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round"/><line x1="131" y1="123" x2="147" y2="138" stroke="#aaa" stroke-width="3.5" stroke-linecap="round"/><circle cx="160" cy="92" r="4.5" fill="#3b82f6" opacity=".55"/><path d="M58 132 L60.5 124 L63 132 L71 134.5 L63 137 L60.5 145 L58 137 L50 134.5 Z" fill="#6366f1" opacity=".45"/><path d="M44 70 Q52 61 59 70 Q66 79 73 70" stroke="#999" stroke-width="2" fill="none" stroke-linecap="round"/></svg>`;
-}
+      /* ═══════════════ EMPTY ILLUSTRATION ═══════════════ */
+      function emptyIllustration() {
+        return `<svg viewBox="0 0 220 190" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:190px;height:165px"><circle cx="110" cy="95" r="76" fill="#e8e8e8"/><rect x="76" y="32" width="72" height="94" rx="6" fill="white" stroke="#d4d4d4" stroke-width="1.5"/><rect x="76" y="32" width="72" height="15" rx="5" fill="#4a4a4a"/><rect x="86" y="56" width="42" height="4" rx="2" fill="#d0d0d0"/><rect x="86" y="65" width="34" height="4" rx="2" fill="#ddd"/><rect x="86" y="74" width="38" height="4" rx="2" fill="#ddd"/><rect x="86" y="83" width="30" height="4" rx="2" fill="#ddd"/><circle cx="124" cy="116" r="32" fill="white" stroke="#d4d4d4" stroke-width="2"/><circle cx="117" cy="109" r="19" fill="#f0f0f0" stroke="#d4d4d4" stroke-width="1.5"/><circle cx="117" cy="109" r="13" fill="#fee2e2"/><line x1="111" y1="103" x2="123" y2="115" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round"/><line x1="123" y1="103" x2="111" y2="115" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round"/><line x1="131" y1="123" x2="147" y2="138" stroke="#aaa" stroke-width="3.5" stroke-linecap="round"/><circle cx="160" cy="92" r="4.5" fill="#3b82f6" opacity=".55"/><path d="M58 132 L60.5 124 L63 132 L71 134.5 L63 137 L60.5 145 L58 137 L50 134.5 Z" fill="#6366f1" opacity=".45"/><path d="M44 70 Q52 61 59 70 Q66 79 73 70" stroke="#999" stroke-width="2" fill="none" stroke-linecap="round"/></svg>`;
+      }
 
-/* ═══════════════ TOAST ═══════════════ */
-function toast(msg,type='success'){
-  const w=document.getElementById('toastWrap');
-  const t=document.createElement('div');t.className=`toast ${type}`;
-  t.innerHTML=`<div class="toast-dot"></div>${esc(msg)}`;
-  w.appendChild(t);
-  setTimeout(()=>{t.style.opacity='0';t.style.transition='opacity .3s';setTimeout(()=>t.remove(),300);},3000);
-}
-function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+      /* ═══════════════ TOAST ═══════════════ */
+      function toast(msg, type = "success") {
+        const w = document.getElementById("toastWrap");
+        const t = document.createElement("div");
+        t.className = `toast ${type}`;
+        t.innerHTML = `<div class="toast-dot"></div>${esc(msg)}`;
+        w.appendChild(t);
+        setTimeout(() => {
+          t.style.opacity = "0";
+          t.style.transition = "opacity .3s";
+          setTimeout(() => t.remove(), 300);
+        }, 3000);
+      }
+      function esc(s) {
+        if (!s) return "";
+        return String(s)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+      }
 
-/* ═══════════════ INIT ═══════════════ */
-document.addEventListener('DOMContentLoaded',()=>{
-  // Load saved school settings
-  const saved=localStorage.getItem('vedaai_school');
-  if(saved){
-    try{
-      const s=JSON.parse(saved);
-      schoolSettings=s;
-      document.getElementById('sbSchoolName').textContent=s.name||'Delhi Public School';
-      document.getElementById('sbSchoolCity').textContent=s.location||'Bokaro Steel City';
-    }catch(e){}
-  }
-  renderDash();
-  renderQTs();
-  const f=document.getElementById('fDue');
-  const fut=new Date();fut.setDate(fut.getDate()+14);
-  f.value=fut.toISOString().split('T')[0];
-  f.min=new Date().toISOString().split('T')[0];
-});
-</script>
-</body>
+      /* ═══════════════ INIT ═══════════════ */
+      document.addEventListener("DOMContentLoaded", () => {
+        // Load saved school settings
+        const saved = localStorage.getItem("vedaai_school");
+        if (saved) {
+          try {
+            const s = JSON.parse(saved);
+            schoolSettings = s;
+            document.getElementById("sbSchoolName").textContent =
+              s.name || "Delhi Public School";
+            document.getElementById("sbSchoolCity").textContent =
+              s.location || "Bokaro Steel City";
+          } catch (e) {}
+        }
+        renderDash();
+        renderQTs();
+        const f = document.getElementById("fDue");
+        const fut = new Date();
+        fut.setDate(fut.getDate() + 14);
+        f.value = fut.toISOString().split("T")[0];
+        f.min = new Date().toISOString().split("T")[0];
+      });
+    </script>
+  </body>
 </html>
