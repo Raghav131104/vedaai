@@ -1,0 +1,11 @@
+node_modules
+.next
+dist
+build
+uploads
+.env
+.env.local
+mongo_data
+redis_data
+*.log
+{frontend,backend}
