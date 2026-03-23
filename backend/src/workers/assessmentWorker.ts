@@ -6,12 +6,8 @@ import { Assignment } from '../models/Assignment';
 import { Assessment } from '../models/Assessment';
 import { buildPrompt, parseAIResponse } from '../services/promptBuilder';
 
-const redisConnection = {
-  host: process.env.REDIS_HOST || 'localhost',
-  port: parseInt(process.env.REDIS_PORT || '6379'),
-  password: process.env.REDIS_PASSWORD || undefined,
-  tls: process.env.REDIS_TLS === 'true' ? {} : undefined,
-};
+// ⭐ FINAL FIX — use Railway Redis
+const redisConnection = getRedis();
 
 export const assessmentQueue = new Queue('assessment-generation', {
   connection: redisConnection,
@@ -24,14 +20,24 @@ export function setupWorkers(): void {
       const { assignmentId, jobId } = job.data;
       console.log(`Processing job ${jobId} for assignment ${assignmentId}`);
 
-      sendJobUpdate(jobId, { type: 'job:started', jobId, message: 'AI is analysing your assignment...', progress: 10 });
+      sendJobUpdate(jobId, {
+        type: 'job:started',
+        jobId,
+        message: 'AI is analysing your assignment...',
+        progress: 10,
+      });
 
       const assignment = await Assignment.findById(assignmentId);
       if (!assignment) throw new Error(`Assignment ${assignmentId} not found`);
 
       await Assignment.findByIdAndUpdate(assignmentId, { status: 'processing' });
 
-      sendJobUpdate(jobId, { type: 'job:progress', jobId, message: 'Building structured prompt...', progress: 25 });
+      sendJobUpdate(jobId, {
+        type: 'job:progress',
+        jobId,
+        message: 'Building structured prompt...',
+        progress: 25,
+      });
 
       const prompt = buildPrompt({
         title: assignment.title,
@@ -43,7 +49,12 @@ export function setupWorkers(): void {
         fileName: assignment.fileName,
       });
 
-      sendJobUpdate(jobId, { type: 'job:progress', jobId, message: 'Generating questions with AI...', progress: 40 });
+      sendJobUpdate(jobId, {
+        type: 'job:progress',
+        jobId,
+        message: 'Generating questions with AI...',
+        progress: 40,
+      });
 
       const redis = getRedis();
       const cacheKey = `assessment:${assignmentId}`;
@@ -55,7 +66,10 @@ export function setupWorkers(): void {
         console.log('Cache hit for assessment');
         rawResponse = cached;
       } else {
-        const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+        const client = new Anthropic({
+          apiKey: process.env.ANTHROPIC_API_KEY,
+        });
+
         const message = await client.messages.create({
           model: 'claude-sonnet-4-20250514',
           max_tokens: 8000,
@@ -63,17 +77,29 @@ export function setupWorkers(): void {
         });
 
         const textContent = message.content.find((c) => c.type === 'text');
-        if (!textContent || textContent.type !== 'text') throw new Error('No text response from AI');
+        if (!textContent || textContent.type !== 'text')
+          throw new Error('No text response from AI');
 
         rawResponse = textContent.text;
         await redis.setex(cacheKey, 86400 * 7, rawResponse);
       }
 
-      sendJobUpdate(jobId, { type: 'job:progress', jobId, message: 'Parsing and structuring response...', progress: 75 });
+      sendJobUpdate(jobId, {
+        type: 'job:progress',
+        jobId,
+        message: 'Parsing and structuring response...',
+        progress: 75,
+      });
 
-      const { sections, totalMarks, duration, title } = parseAIResponse(rawResponse);
+      const { sections, totalMarks, duration } =
+        parseAIResponse(rawResponse);
 
-      sendJobUpdate(jobId, { type: 'job:progress', jobId, message: 'Saving to database...', progress: 90 });
+      sendJobUpdate(jobId, {
+        type: 'job:progress',
+        jobId,
+        message: 'Saving to database...',
+        progress: 90,
+      });
 
       const assessment = await Assessment.create({
         assignmentId,
@@ -85,22 +111,46 @@ export function setupWorkers(): void {
         sections,
       });
 
-      await Assignment.findByIdAndUpdate(assignmentId, { status: 'completed', assessmentId: assessment._id });
+      await Assignment.findByIdAndUpdate(assignmentId, {
+        status: 'completed',
+        assessmentId: assessment._id,
+      });
 
-      sendJobUpdate(jobId, { type: 'job:completed', jobId, message: 'Question paper generated successfully!', progress: 100, assessmentId: assessment._id.toString() });
+      sendJobUpdate(jobId, {
+        type: 'job:completed',
+        jobId,
+        message: 'Question paper generated successfully!',
+        progress: 100,
+        assessmentId: assessment._id.toString(),
+      });
 
-      console.log(`Job ${jobId} completed. Assessment: ${assessment._id}`);
+      console.log(
+        `Job ${jobId} completed. Assessment: ${assessment._id}`
+      );
+
       return { assessmentId: assessment._id.toString() };
     },
-    { connection: redisConnection, concurrency: 3 }
+    {
+      connection: redisConnection,
+      concurrency: 3,
+    }
   );
 
   worker.on('failed', async (job, err) => {
     if (job) {
       const { assignmentId, jobId } = job.data;
       console.error(`Job ${jobId} failed:`, err.message);
-      await Assignment.findByIdAndUpdate(assignmentId, { status: 'failed' });
-      sendJobUpdate(jobId, { type: 'job:failed', jobId, message: err.message || 'Generation failed', progress: 0 });
+
+      await Assignment.findByIdAndUpdate(assignmentId, {
+        status: 'failed',
+      });
+
+      sendJobUpdate(jobId, {
+        type: 'job:failed',
+        jobId,
+        message: err.message || 'Generation failed',
+        progress: 0,
+      });
     }
   });
 
