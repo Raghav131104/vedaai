@@ -18,6 +18,8 @@ console.log("REDIS_URL =", process.env.REDIS_URL);
 const app = express();
 const server = http.createServer(app);
 
+/* -------------------- MIDDLEWARE -------------------- */
+
 app.use(
   cors({
     origin: process.env.ALLOWED_ORIGINS?.split(",") || "*",
@@ -29,25 +31,28 @@ app.use(
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
 
-// Routes
+/* -------------------- ROUTES -------------------- */
+
 app.use("/api/assignments", assignmentRoutes);
 app.use("/api/assessments", assessmentRoutes);
 app.use("/api/settings", settingsRoutes);
 
-// Health Route
 app.get("/health", (_req, res) => {
-  res.json({
-    status: "ok",
-    timestamp: new Date().toISOString(),
-  });
+  res.json({ status: "ok", time: new Date().toISOString() });
 });
 
-const PORT = process.env.PORT || 8080;
+/* -------------------- PORT FIX -------------------- */
+/* Railway gives PORT env variable */
+
+const PORT = Number(process.env.PORT) || 8080;
+
+/* -------------------- BOOTSTRAP -------------------- */
 
 async function bootstrap() {
   try {
     console.log("Connecting Mongo...");
     await connectDB();
+    console.log("Mongo Connected");
 
     console.log("Starting WebSocket...");
     setupWebSocket(server);
@@ -55,12 +60,11 @@ async function bootstrap() {
     console.log("Starting BullMQ Workers...");
     setupWorkers();
 
-    server.listen(Number(PORT), "0.0.0.0", () => {
-      console.log(`✅ VedaAI Backend running on port ${PORT}`);
+    server.listen(PORT, "0.0.0.0", () => {
+      console.log(`VedaAI Backend running on port ${PORT}`);
     });
-
   } catch (error) {
-    console.error("❌ Failed to start server:", error);
+    console.error(" Failed to start server:", error);
     process.exit(1);
   }
 }
