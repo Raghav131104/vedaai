@@ -6,7 +6,6 @@ import { Assignment } from '../models/Assignment';
 import { Assessment } from '../models/Assessment';
 import { buildPrompt, parseAIResponse } from '../services/promptBuilder';
 
-// ⭐ FINAL FIX — use Railway Redis
 const redisConnection = getRedis();
 
 export const assessmentQueue = new Queue('assessment-generation', {
