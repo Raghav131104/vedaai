@@ -4,6 +4,8 @@ let redisClient: Redis | null = null;
 
 export function getRedis(): Redis {
   if (!redisClient) {
+    console.log("Creating Redis with URL:", process.env.REDIS_URL);
+
     const url = process.env.REDIS_URL;
 
     if (!url) {

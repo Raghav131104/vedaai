@@ -9,6 +9,8 @@ import assignmentRoutes from './routes/assignments';
 import assessmentRoutes from './routes/assessments';
 import settingsRoutes from './routes/settings';
 
+console.log("REDIS_URL =", process.env.REDIS_URL);
+
 dotenv.config();
 
 const app = express();
