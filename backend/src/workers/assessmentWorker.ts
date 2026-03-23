@@ -6,10 +6,8 @@ import { Assignment } from '../models/Assignment';
 import { Assessment } from '../models/Assessment';
 import { buildPrompt, parseAIResponse } from '../services/promptBuilder';
 
-// ⭐ FINAL FIX — BullMQ MUST use URL connection
-const redisConnection = {
-  url: process.env.REDIS_URL!,
-};
+// ⭐ FINAL FIX — use Railway Redis
+const redisConnection = getRedis();
 
 export const assessmentQueue = new Queue('assessment-generation', {
   connection: redisConnection,
@@ -20,7 +18,6 @@ export function setupWorkers(): void {
     'assessment-generation',
     async (job) => {
       const { assignmentId, jobId } = job.data;
-
       console.log(`Processing job ${jobId} for assignment ${assignmentId}`);
 
       sendJobUpdate(jobId, {
@@ -33,9 +30,7 @@ export function setupWorkers(): void {
       const assignment = await Assignment.findById(assignmentId);
       if (!assignment) throw new Error(`Assignment ${assignmentId} not found`);
 
-      await Assignment.findByIdAndUpdate(assignmentId, {
-        status: 'processing',
-      });
+      await Assignment.findByIdAndUpdate(assignmentId, { status: 'processing' });
 
       sendJobUpdate(jobId, {
         type: 'job:progress',
@@ -61,7 +56,6 @@ export function setupWorkers(): void {
         progress: 40,
       });
 
-      // ⭐ cache still uses shared redis helper
       const redis = getRedis();
       const cacheKey = `assessment:${assignmentId}`;
       const cached = await redis.get(cacheKey);
@@ -73,7 +67,7 @@ export function setupWorkers(): void {
         rawResponse = cached;
       } else {
         const client = new Anthropic({
-          apiKey: process.env.ANTHROPIC_API_KEY!,
+          apiKey: process.env.ANTHROPIC_API_KEY,
         });
 
         const message = await client.messages.create({
@@ -83,9 +77,8 @@ export function setupWorkers(): void {
         });
 
         const textContent = message.content.find((c) => c.type === 'text');
-        if (!textContent || textContent.type !== 'text') {
+        if (!textContent || textContent.type !== 'text')
           throw new Error('No text response from AI');
-        }
 
         rawResponse = textContent.text;
         await redis.setex(cacheKey, 86400 * 7, rawResponse);
@@ -131,7 +124,9 @@ export function setupWorkers(): void {
         assessmentId: assessment._id.toString(),
       });
 
-      console.log(`Job ${jobId} completed`);
+      console.log(
+        `Job ${jobId} completed. Assessment: ${assessment._id}`
+      );
 
       return { assessmentId: assessment._id.toString() };
     },
@@ -144,7 +139,6 @@ export function setupWorkers(): void {
   worker.on('failed', async (job, err) => {
     if (job) {
       const { assignmentId, jobId } = job.data;
-
       console.error(`Job ${jobId} failed:`, err.message);
 
       await Assignment.findByIdAndUpdate(assignmentId, {
