@@ -1,7 +1,15 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
-export async function connectDB(): Promise<void> {
-  const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/vedaai';
+export async function connectDB() {
+  const uri = process.env.MONGODB_URI;
+
+  console.log("Mongo URI =", uri);
+
+  if (!uri) {
+    throw new Error("MONGODB_URI missing");
+  }
+
   await mongoose.connect(uri);
-  console.log('MongoDB connected');
+
+  console.log("✅ Mongo Connected");
 }
