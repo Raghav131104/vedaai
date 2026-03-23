@@ -1,7 +1,15 @@
-FROM node:20-alpine
+FROM node:20
+
 WORKDIR /app
-COPY package.json ./
-RUN npm install --no-audit --no-fund --prefer-offline
+
+COPY package*.json ./
+
+RUN npm install
+
 COPY . .
-EXPOSE 3001
-CMD ["npm", "run", "dev"]
+
+RUN npm run build
+
+EXPOSE 8080
+
+CMD ["npm","start"]
